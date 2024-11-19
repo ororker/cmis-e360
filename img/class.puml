@@ -1,0 +1,22 @@
+@startuml
+!pragma layout smetana
+
+Institution -up-> Campus
+Campus -up-> Building
+Building -up-> Room
+
+Institution -up-> Organisation
+Organisation -up-> Department
+Department -up-> Course
+Course -up-> Section
+
+Institution -up-> User/\nLecturer
+
+Schedule -down-> Room
+Schedule -down-> Section
+Schedule -down-> User/\nLecturer
+
+hide empty fields
+hide empty methods
+@enduml
+
