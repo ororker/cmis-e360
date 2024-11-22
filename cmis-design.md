@@ -11,6 +11,15 @@ E360
 SpaceTT2
 : A new component that may be implemented by GU IT department to automate the integration between CMIS and Echo360.
 
+## TODO
+1. verify that where a timetable entry with entryslot <> 1 that it will not have an impact on integration
+2. could we update every minute in the expectation that few clashes will occur and repair clashes over-night with batch?
+3. when will E360 report a clash? 
+
+## Challenges in integrating to Echo360 from CMIS
+One of the most challenging aspects of integrating CMIS to Echo360 is that E360 does not support invalid
+timetables.
+
 ## Different data model structures
 
 The data models used by CMIS and E360 differ in one very distinct aspect,
@@ -355,6 +364,19 @@ being retried and therefore if it fails on this occasion then we can assume it w
 ### Venue / Time slot is already taken
 When an insert or update request receives a `Schedule timing clash with another Schedule` error then record this error in
 `STT_ECHO_QUEUE.ERROR` and do not resend until the issue has been resolved manually.
+
+### Device not found in Room
+```json
+{"error":"JsonError","param":{"obj.venue.room":[{"msg":"Device not found in Room","args":[]}]}}
+```
+
+### Can a lecturer teach in 2 different rooms at the same time? YES
+To investigate this I created 2 almost identical schedules, with only
+the room and external ids being different as shown below:
+![Same Lecturer Different Room](img/same-lect-diff-room.png)
+
+This establishes that the same presenter can be assigned to
+present in different rooms but at the same time.
 
 ### Other errors
 When any other errors occur note them in `STT_ECHO_QUEUE.ERROR`
