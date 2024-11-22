@@ -1,0 +1,76 @@
+{
+  "data": [
+    {
+      "id": "5eabbaf7-a7ee-4322-a582-bec332620dde",
+      "campusId": "5287b36c-3675-4589-9917-d7173077fbef",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "5 Professors' Square",
+      "externalId": "111"
+    },
+    {
+      "id": "db0eef80-b416-4434-95df-75cc95b592be",
+      "campusId": "5287b36c-3675-4589-9917-d7173077fbef",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "6 Professors' Square",
+      "externalId": "112"
+    },
+    {
+      "id": "661a8a32-bcff-4043-92c7-4d0dc5f549b8",
+      "campusId": "5287b36c-3675-4589-9917-d7173077fbef",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "9 Professors' Square",
+      "externalId": "115"
+    },
+    {
+      "id": "832b76da-8bdf-478e-a2ce-db75c52fa4c9",
+      "campusId": "5287b36c-3675-4589-9917-d7173077fbef",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "Adam Smith Building",
+      "externalId": "322"
+    },
+    {
+      "id": "7ff655ce-a0f2-4e81-844b-7efd93cdcc3b",
+      "campusId": "5287b36c-3675-4589-9917-d7173077fbef",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "Boyd Orr Building",
+      "externalId": "295"
+    },
+    {
+      "id": "9b9457f0-081c-444d-8ba0-2c0796c4d688",
+      "campusId": "5287b36c-3675-4589-9917-d7173077fbef",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "Davidson Building",
+      "externalId": "126"
+    },
+    {
+      "id": "18cec0a3-514b-49ba-b554-a01cc2b94afa",
+      "campusId": "5287b36c-3675-4589-9917-d7173077fbef",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "Graham Kerr Building",
+      "externalId": "125"
+    },
+    {
+      "id": "8f7f74d7-51a9-4c69-adbc-1d17eb30a827",
+      "campusId": "5287b36c-3675-4589-9917-d7173077fbef",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "Hetherington Building",
+      "externalId": "345"
+    },
+    {
+      "id": "510e4731-4047-4f63-8427-8b23a8bf1e66",
+      "campusId": "5287b36c-3675-4589-9917-d7173077fbef",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "Hunterian Art Gallery",
+      "externalId": "324"
+    },
+    {
+      "id": "cea00966-4083-466a-b6fb-320ca496f87a",
+      "campusId": "5287b36c-3675-4589-9917-d7173077fbef",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "James McCune Smith Learning Hub",
+      "externalId": "173"
+    }
+  ],
+  "has_more": true,
+  "next": "/public/api/v1/buildings?limit=10&offset=eyJjYW1wdXNJZCI6eyJzIjoiNTI4N2IzNmMtMzY3NS00NTg5LTk5MTctZDcxNzMwNzdmYmVmIn0sImlkIjp7InMiOiJjZWEwMDk2Ni00MDgzLTQ2NmEtYjZmYi0zMjBjYTQ5NmY4N2EifSwibm9ybWFsaXplZE5hbWUiOnsicyI6ImphbWVzbWNjdW5lc21pdGhsZWFybmluZ2h1YiJ9fQ%3D%3D"
+}

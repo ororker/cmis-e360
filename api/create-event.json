@@ -1,0 +1,22 @@
+{
+  "startDate": "2024-11-15",
+  "startTime": "08:00",
+  "endTime": "09:00",
+  "sections": [
+    {
+      "sectionId": "8b2437e9-3639-4f9f-9683-c7c869bd187e"
+    }
+  ],
+  "name": "Test New Schedule Name",
+  "venue": {
+    "campusName": "GILMOREHILL CAMPUS",
+    "buildingName": "Test",
+    "roomName": "Main Meeting Room"
+  },
+  "presenter": {
+    "userId": "14590435-35ff-4650-adf2-796c0e612ad0"
+  },
+  "input1": "Display",
+  "input2": "Video",
+  "captureQuality": "High"
+}

@@ -1,0 +1,23 @@
+{
+  "startDate": "2024-11-15",
+  "startTime": "16:00",
+  "endTime": "17:00",
+  "sections": [
+    {
+      "sectionExternalId": "ENGLANG1003_LC01"
+    }
+  ],
+  "name": "Test New Schedule Name",
+  "externalId": "617747-1-2023-24",
+  "venue": {
+    "campusName": "GILMOREHILL CAMPUS",
+    "buildingName": "Test",
+    "roomName": "Main Meeting Room"
+  },
+  "presenter": {
+    "userEmail": "David.J.Forrest@glasgow.ac.uk"
+  },
+  "input1": "Display",
+  "input2": "Video",
+  "captureQuality": "High"
+}

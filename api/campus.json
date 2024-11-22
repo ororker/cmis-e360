@@ -1,0 +1,68 @@
+{
+  "data": [
+    {
+      "id": "59dfb290-cf20-4cb8-b88f-c02a0bf0eb6e",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "DENTAL HOSPITAL & SCHOOL",
+      "timeZone": "Europe/London",
+      "timeZoneOffsetMinutes": 0,
+      "externalId": "DHS"
+    },
+    {
+      "id": "3b5ea694-47a4-45a8-b747-bfb5fcef1b17",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "GARSCUBE CAMPUS",
+      "timeZone": "Europe/London",
+      "timeZoneOffsetMinutes": 0,
+      "externalId": "GC2"
+    },
+    {
+      "id": "5287b36c-3675-4589-9917-d7173077fbef",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "GILMOREHILL CAMPUS",
+      "timeZone": "Europe/London",
+      "timeZoneOffsetMinutes": 0,
+      "externalId": "GC1"
+    },
+    {
+      "id": "2eb37573-8327-4a19-9248-43e7d3d85525",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "OCA",
+      "timeZone": "Europe/London",
+      "timeZoneOffsetMinutes": 0
+    },
+    {
+      "id": "2ac2d071-62e6-4940-9d70-f767942bab5e",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "OUTLYING AREAS",
+      "timeZone": "Europe/London",
+      "timeZoneOffsetMinutes": 0,
+      "externalId": "OUT"
+    },
+    {
+      "id": "038e582c-c015-4495-9f65-e9962fe232e3",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "QUEEN ELIZABETH UNIV HOSPITAL",
+      "timeZone": "Europe/London",
+      "timeZoneOffsetMinutes": 0,
+      "externalId": "SG1"
+    },
+    {
+      "id": "728f9156-984b-4cf0-a8f2-00bc13495d86",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "ROYAL INFIRMARY",
+      "timeZone": "Europe/London",
+      "timeZoneOffsetMinutes": 0,
+      "externalId": "RI1"
+    },
+    {
+      "id": "a8800ab4-0451-4006-950f-8cbf36a5da02",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "WESTERN SITE",
+      "timeZone": "Europe/London",
+      "timeZoneOffsetMinutes": 0,
+      "externalId": "WI1"
+    }
+  ],
+  "has_more": false
+}

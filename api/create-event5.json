@@ -1,0 +1,21 @@
+{
+  "startDate": "2024-11-15",
+  "startTime": "16:00",
+  "endTime": "17:00",
+  "sections": [
+    {
+      "sectionExternalId": "ENGLANG1003_LC01"
+    }
+  ],
+  "name": "Test New Schedule Name - X",
+  "externalId": "617749-1-2023-24",
+  "venue": {
+    "roomExternalId": "ROOM1"
+  },
+  "presenter": {
+    "userEmail": "David.J.Forrest@glasgow.ac.uk"
+  },
+  "input1": "Display",
+  "input2": "Video",
+  "captureQuality": "High"
+}

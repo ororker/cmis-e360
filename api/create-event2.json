@@ -1,0 +1,22 @@
+{
+  "startDate": "2024-11-15",
+  "startTime": "12:00",
+  "endTime": "13:00",
+  "sections": [
+    {
+      "sectionExternalId": "ENGLANG1003_LC01"
+    }
+  ],
+  "name": "Test New Schedule Name",
+  "venue": {
+    "campusName": "GILMOREHILL CAMPUS",
+    "buildingName": "Test",
+    "roomName": "Main Meeting Room"
+  },
+  "presenter": {
+    "userId": "14590435-35ff-4650-adf2-796c0e612ad0"
+  },
+  "input1": "Display",
+  "input2": "Video",
+  "captureQuality": "High"
+}

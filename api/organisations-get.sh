@@ -1,0 +1,8 @@
+#!/bin/bash
+
+export ACCESS_TOKEN="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJFY2hvMzYwIiwiZXhwIjoxNzMwMjIxNTk4LCJjb250ZW50Ijp7ImNsaWVudElkIjoiMWQwNDU3YjUtNjcwNy00M2Q3LTk2NGQtOWE1MTkzYTdiNWU5IiwiYXV0aERhdGEiOnsiaW5zdGl0dXRpb25JZCI6IjUzYThmOTljLWZiNDEtNDEzOS05YzNjLWM0NzFjNDlmOGNmNyJ9LCJjcmVhdGVkQXQiOnsieWVhciI6MjAyNCwibW9udGgiOjEwLCJkYXkiOjI5fX19.dRvWHfvT6B_Ptiua75CdhzEs4d4lAotIooHOLNnkqNv1GYPjfyie4NNS6pHx6F4QvPWzstxRI8REb-8eqdLW9A"
+export LIMIT=10
+
+export URL="https://echo360.org.uk:443/public/api/v1/organizations?limit=$LIMIT&access_token=$ACCESS_TOKEN"
+
+curl "$URL" | jq .

@@ -1,0 +1,36 @@
+{
+  "id": "3cfe1d3a-57b7-4731-90f2-5171afadcbd1",
+  "startDate": "2024-11-15",
+  "startTime": "12:00",
+  "endTime": "13:00",
+  "sections": [
+    {
+      "courseId": "66567d3e-b575-43cc-ba1a-4f4510bbbb72",
+      "courseIdentifier": "ENGLANG1003",
+      "termId": "ac00a9be-15f9-4f84-a85e-f9edf50ea38d",
+      "termName": "2020/21",
+      "sectionId": "8b2437e9-3639-4f9f-9683-c7c869bd187e",
+      "sectionName": "LC01"
+    }
+  ],
+  "name": "Test New Schedule Name",
+  "venue": {
+    "campusId": "5287b36c-3675-4589-9917-d7173077fbef",
+    "campusName": "GILMOREHILL CAMPUS",
+    "buildingId": "8479ac03-735f-4982-bdb8-3617978bfd00",
+    "buildingName": "Test",
+    "roomId": "d73fa127-9cd5-44f9-9cfa-d2445dcafd23",
+    "roomName": "Main Meeting Room"
+  },
+  "presenter": {
+    "userId": "14590435-35ff-4650-adf2-796c0e612ad0",
+    "userEmail": "David.J.Forrest@glasgow.ac.uk"
+  },
+  "shouldCaption": false,
+  "shouldStreamLive": false,
+  "shouldAutoPublish": true,
+  "shouldRecurCapture": false,
+  "input1": "Display",
+  "input2": "Video",
+  "captureQuality": "High"
+}

@@ -1,0 +1,96 @@
+{
+  "data": [
+    {
+      "id": "b5e14dd0-4154-46df-bff8-ee0d255724b2",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "ADAM SMITH BUSINESS SCHOOL",
+      "departmentCount": 3,
+      "courseCount": 342,
+      "sectionCount": 515,
+      "externalId": "40100000"
+    },
+    {
+      "id": "40b22a62-c032-498c-9675-12f57978f11c",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "ADAM SMITH RESEARCH FOUNDATION",
+      "departmentCount": 0,
+      "courseCount": 0,
+      "sectionCount": 0,
+      "externalId": "45000000"
+    },
+    {
+      "id": "1334f9b8-374d-4479-8e6f-968c745f505c",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "COLLEGE OF ARTS ADMINISTRATION",
+      "departmentCount": 2,
+      "courseCount": 0,
+      "sectionCount": 0,
+      "externalId": "19900000"
+    },
+    {
+      "id": "fc89f64d-d52f-4f2a-8380-c7496a0137a1",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "COLLEGE OF MVLS ADMINISTRATION",
+      "departmentCount": 1,
+      "courseCount": 0,
+      "sectionCount": 0,
+      "externalId": "29900000"
+    },
+    {
+      "id": "a95df8b0-d0f0-4e53-a2e0-d50cc50a46b7",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "COLLEGE OF SCIENCE & ENGINEERING ADMIN",
+      "departmentCount": 2,
+      "courseCount": 0,
+      "sectionCount": 0,
+      "externalId": "39900000"
+    },
+    {
+      "id": "f2329ef2-9ac2-47ea-a101-e7f3b6148c1a",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "COLLEGE OF SOCIAL SCIENCES ADMIN",
+      "departmentCount": 1,
+      "courseCount": 0,
+      "sectionCount": 0,
+      "externalId": "49900000"
+    },
+    {
+      "id": "82936160-e110-4706-b00e-4bc1aa513ce5",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "RI BIODIVERSITY ANIMAL HEALTH & COMPMED",
+      "departmentCount": 0,
+      "courseCount": 0,
+      "sectionCount": 0,
+      "externalId": "25000000"
+    },
+    {
+      "id": "00dba279-489f-4305-a31f-be4a29aeac67",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "RI CANCER SCIENCES",
+      "departmentCount": 0,
+      "courseCount": 0,
+      "sectionCount": 0,
+      "externalId": "25100000"
+    },
+    {
+      "id": "d1b825c5-6e28-4584-8880-a0cdcfce07ad",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "RI CARDIOVASCULAR & MEDICAL SCIENCES",
+      "departmentCount": 0,
+      "courseCount": 0,
+      "sectionCount": 0,
+      "externalId": "25200000"
+    },
+    {
+      "id": "7adb0dfe-db2f-4120-b964-729136bf036f",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "RI HEALTH & WELLBEING",
+      "departmentCount": 5,
+      "courseCount": 0,
+      "sectionCount": 0,
+      "externalId": "25600000"
+    }
+  ],
+  "has_more": true,
+  "next": "/public/api/v1/organizations?limit=10&offset=eyJpbnN0aXR1dGlvbklkIjp7InMiOiI1M2E4Zjk5Yy1mYjQxLTQxMzktOWMzYy1jNDcxYzQ5ZjhjZjcifSwiaWQiOnsicyI6IjdhZGIwZGZlLWRiMmYtNDEyMC1iOTY0LTcyOTEzNmJmMDM2ZiJ9LCJub3JtYWxpemVkTmFtZSI6eyJzIjoicmloZWFsdGh3ZWxsYmVpbmcifX0%3D"
+}

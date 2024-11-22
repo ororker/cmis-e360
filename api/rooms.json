@@ -1,0 +1,77 @@
+{
+  "data": [
+    {
+      "id": "a7c240b6-3e29-49be-8db2-ab23e2eafff5",
+      "buildingId": "7ff655ce-a0f2-4e81-844b-7efd93cdcc3b",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "611 (Lt E)",
+      "createdAt": "2020-07-10T08:03:02.213Z",
+      "updatedAt": "2020-07-10T08:03:02.213Z",
+      "externalId": "2950611"
+    },
+    {
+      "id": "2e310f40-5396-4a62-8ac5-534a93d2e21c",
+      "buildingId": "7ff655ce-a0f2-4e81-844b-7efd93cdcc3b",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "222 Lec Theatre 2",
+      "createdAt": "2020-07-10T08:03:02.011Z",
+      "updatedAt": "2020-07-10T08:03:02.011Z",
+      "externalId": "2950222"
+    },
+    {
+      "id": "38e8daad-a969-417b-8c57-eea73c19729e",
+      "buildingId": "7ff655ce-a0f2-4e81-844b-7efd93cdcc3b",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "407 (Lt A)",
+      "createdAt": "2020-07-10T08:03:01.205Z",
+      "updatedAt": "2020-07-10T08:03:01.205Z",
+      "externalId": "2950407"
+    },
+    {
+      "id": "f72158fb-cf84-412d-aa50-564a4b089dca",
+      "buildingId": "7ff655ce-a0f2-4e81-844b-7efd93cdcc3b",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "412 (Lt B)",
+      "createdAt": "2024-04-17T12:48:22.968Z",
+      "updatedAt": "2024-04-17T12:48:22.968Z",
+      "externalId": "2950412"
+    },
+    {
+      "id": "fbfc272c-b495-466c-8ff3-37f39308006d",
+      "buildingId": "7ff655ce-a0f2-4e81-844b-7efd93cdcc3b",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "203 Lec Theatre 1",
+      "createdAt": "2020-07-10T08:03:06.828Z",
+      "updatedAt": "2020-07-10T08:03:06.828Z",
+      "externalId": "2950203"
+    },
+    {
+      "id": "dc1c27da-b9d9-4ffb-adb8-a154f53ca95e",
+      "buildingId": "7ff655ce-a0f2-4e81-844b-7efd93cdcc3b",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "709ab Classroom",
+      "createdAt": "2024-04-17T12:48:22.292Z",
+      "updatedAt": "2024-04-17T12:48:22.292Z",
+      "externalId": "2950709AB"
+    },
+    {
+      "id": "4a7697f1-cb53-44d5-8d5c-b2d3502b5190",
+      "buildingId": "7ff655ce-a0f2-4e81-844b-7efd93cdcc3b",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "507 (Lt C)",
+      "createdAt": "2020-07-10T08:02:57.938Z",
+      "updatedAt": "2020-07-10T08:02:57.938Z",
+      "externalId": "2950507"
+    },
+    {
+      "id": "72807d2d-0156-4b87-8b11-703c7c3c9377",
+      "buildingId": "7ff655ce-a0f2-4e81-844b-7efd93cdcc3b",
+      "institutionId": "53a8f99c-fb41-4139-9c3c-c471c49f8cf7",
+      "name": "513 (Lt D)",
+      "createdAt": "2020-07-10T08:03:03.994Z",
+      "updatedAt": "2020-07-10T08:03:03.994Z",
+      "externalId": "2950513"
+    }
+  ],
+  "has_more": false
+}
