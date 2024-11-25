@@ -20,6 +20,32 @@ SpaceTT2
 One of the most challenging aspects of integrating CMIS to Echo360 is that E360 does not support invalid
 timetables.
 
+To understand the scale of the problem:
+### No of rooms E360 is used in (23/24): 198
+The following sql was used to identify all of the rooms with audio/visual equipment used for lectures in 2023/4
+```sql
+select 
+    roomid, roomgrpcode, count(*)
+from (
+    select t.roomid, t.roomgrpcode, (ws.startdate + t.weekday), t.starttime, t.finishtime, t.lecturerid, p.BUSINESSEMAIL, t.moduleid, t.modgrpcode, rr.itemnum, rr.featureid 
+    from timetable t 
+        inner join weekmapnumeric wmn on wmn.setid = t.setid and wmn.weekid = t.weekid
+        inner join weekstructure ws on ws.setid = wmn.setid and ws.weeknumber = wmn.weeknumber
+        left outer join stt_ext_person p on p.personno = t.lecturerid
+        left outer join roomrequests rr on rr.setid = t.setid and rr.slotid = t.slotid and rr.slotentry = t.slotentry
+    where t.setid = '2023/24' and t.slotentry = 1 and t.status = 2 and t.sourcesid = 'TEACH' and roomid is not null and rr.featureid in ('AUDIOREC', 'VIDEOREC')
+    order by t.roomid, ws.startdate, t.weekday, t.starttime
+) tt
+group by roomid, roomgrpcode
+order by 3 desc, 1, 2
+;
+```
+
+The most used room was 203 Lec Theatre 1, Boyd Orr (ID=2950203) that was used 766 times.
+
+There are 198 rooms with audio/visual equipment.
+
+
 ## Different data model structures
 
 The data models used by CMIS and E360 differ in one very distinct aspect,
