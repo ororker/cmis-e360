@@ -1,4 +1,5 @@
 # From conflict to conflict with one event moving to a different room and clashing with other room's event
+
 Given the cmis schedule is as follows:
 
 | id | room | start | end  |
@@ -7,7 +8,7 @@ Given the cmis schedule is as follows:
 | 2  | 1    | 1000  | 1100 |
 | 3  | 2    | 1100  | 1200 |
 
-And the e360 schedule is as follows: // due to previous conflict events were deleted
+And the e360 schedule is as follows: // due to previous conflict events 1 & 2 were deleted within E360
 
 | id | room | start | end  |
 |----|------|-------|------|
