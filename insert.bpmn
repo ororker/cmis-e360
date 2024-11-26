@@ -43,7 +43,7 @@
         <bpmn:outgoing>Flow_0u409ww</bpmn:outgoing>
       </bpmn:exclusiveGateway>
       <bpmn:sequenceFlow id="Flow_16lwj35" sourceRef="Activity_1a7pff5" targetRef="Gateway_1vz7j90" />
-      <bpmn:task id="Activity_0stq8u1" name="Schedule Room/Day Refresh">
+      <bpmn:task id="Activity_0stq8u1" name="Mark Room/Day in conflict">
         <bpmn:incoming>Flow_18u5dtw</bpmn:incoming>
         <bpmn:outgoing>Flow_1isvk84</bpmn:outgoing>
       </bpmn:task>
