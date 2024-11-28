@@ -1,144 +1,175 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0fkovbr" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.29.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
   <bpmn:process id="Process_1pdzon5" isExecutable="true">
-    <bpmn:task id="Activity_053ef1n" name="Calc requests required to align E360 to CMIS without conflicts">
-      <bpmn:incoming>Flow_0znhzo6</bpmn:incoming>
-      <bpmn:outgoing>Flow_1xxggf0</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:endEvent id="Event_0npthha">
-      <bpmn:incoming>Flow_083enw6</bpmn:incoming>
-      <bpmn:incoming>Flow_055eh49</bpmn:incoming>
+    <bpmn:endEvent id="Event_03zxaaf">
+      <bpmn:incoming>Flow_09a9vvn</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:startEvent id="Event_1oajb0x">
-      <bpmn:outgoing>Flow_0s1g2dm</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1vwrwqy</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:task id="Activity_1esxglx" name="Fetch Room data from CMIS">
-      <bpmn:incoming>Flow_0njk30k</bpmn:incoming>
-      <bpmn:outgoing>Flow_0znhzo6</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Activity_0njsxje" name="Fetch Room data from E360">
-      <bpmn:incoming>Flow_0s1g2dm</bpmn:incoming>
-      <bpmn:outgoing>Flow_0njk30k</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:sequenceFlow id="Flow_055eh49" sourceRef="Activity_0kez8ld" targetRef="Event_0npthha" />
-    <bpmn:sequenceFlow id="Flow_083enw6" sourceRef="Activity_0tadvng" targetRef="Event_0npthha" />
-    <bpmn:sequenceFlow id="Flow_0njk30k" sourceRef="Activity_0njsxje" targetRef="Activity_1esxglx" />
-    <bpmn:sequenceFlow id="Flow_0s1g2dm" sourceRef="Event_1oajb0x" targetRef="Activity_0njsxje" />
-    <bpmn:sequenceFlow id="Flow_0znhzo6" sourceRef="Activity_1esxglx" targetRef="Activity_053ef1n" />
-    <bpmn:sequenceFlow id="Flow_1ul2urg" sourceRef="Activity_1hr3hnm" targetRef="Gateway_192xif1" />
-    <bpmn:sequenceFlow id="Flow_1xxggf0" sourceRef="Activity_053ef1n" targetRef="Activity_1hr3hnm" />
-    <bpmn:exclusiveGateway id="Gateway_192xif1">
-      <bpmn:incoming>Flow_1ul2urg</bpmn:incoming>
-      <bpmn:outgoing>Flow_0zmnwol</bpmn:outgoing>
-      <bpmn:outgoing>Flow_06lj7br</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_0zmnwol" name="inConflict" sourceRef="Gateway_192xif1" targetRef="Activity_0tadvng" />
-    <bpmn:task id="Activity_0tadvng" name="Insert/Update Room/Day In Conflict mark">
-      <bpmn:incoming>Flow_0zmnwol</bpmn:incoming>
-      <bpmn:outgoing>Flow_083enw6</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:sequenceFlow id="Flow_06lj7br" name="not inConflict" sourceRef="Gateway_192xif1" targetRef="Activity_0kez8ld" />
-    <bpmn:task id="Activity_0kez8ld" name="Remove Room/Day In Conflict mark">
-      <bpmn:incoming>Flow_06lj7br</bpmn:incoming>
-      <bpmn:outgoing>Flow_055eh49</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Activity_1hr3hnm" name="Send requests to E360">
-      <bpmn:incoming>Flow_1xxggf0</bpmn:incoming>
-      <bpmn:outgoing>Flow_1ul2urg</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:textAnnotation id="TextAnnotation_0qkusmf">
+    <bpmn:sequenceFlow id="Flow_09a9vvn" sourceRef="Activity_0fk6wtr" targetRef="Event_03zxaaf" />
+    <bpmn:sequenceFlow id="Flow_1vwrwqy" sourceRef="Event_1oajb0x" targetRef="Activity_0fk6wtr" />
+    <bpmn:subProcess id="Activity_0fk6wtr" name="for each room associated with the notification">
+      <bpmn:incoming>Flow_1vwrwqy</bpmn:incoming>
+      <bpmn:outgoing>Flow_09a9vvn</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics isSequential="true" />
+      <bpmn:task id="Activity_1s4az3n" name="Calc requests required to align E360 to CMIS without conflicts">
+        <bpmn:incoming>Flow_0wwy50n</bpmn:incoming>
+        <bpmn:outgoing>Flow_1lqnabx</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:startEvent id="Event_0cm3cez">
+        <bpmn:outgoing>Flow_132fgxo</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:endEvent id="Event_1j7k9s3">
+        <bpmn:incoming>Flow_146ombt</bpmn:incoming>
+        <bpmn:incoming>Flow_0o6w60m</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:task id="Activity_017sh1i" name="Fetch Room data from CMIS">
+        <bpmn:incoming>Flow_160zv6j</bpmn:incoming>
+        <bpmn:outgoing>Flow_0wwy50n</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:task id="Activity_0qeu1uk" name="Fetch Room data from E360">
+        <bpmn:incoming>Flow_132fgxo</bpmn:incoming>
+        <bpmn:outgoing>Flow_160zv6j</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:sequenceFlow id="Flow_07c0v3z" sourceRef="Activity_01630p6" targetRef="Gateway_0sy9ifb" />
+      <bpmn:sequenceFlow id="Flow_0o6w60m" sourceRef="Activity_1uefbch" targetRef="Event_1j7k9s3" />
+      <bpmn:sequenceFlow id="Flow_0wwy50n" sourceRef="Activity_017sh1i" targetRef="Activity_1s4az3n" />
+      <bpmn:sequenceFlow id="Flow_132fgxo" sourceRef="Event_0cm3cez" targetRef="Activity_0qeu1uk" />
+      <bpmn:sequenceFlow id="Flow_146ombt" sourceRef="Activity_1h73jir" targetRef="Event_1j7k9s3" />
+      <bpmn:sequenceFlow id="Flow_160zv6j" sourceRef="Activity_0qeu1uk" targetRef="Activity_017sh1i" />
+      <bpmn:sequenceFlow id="Flow_1lqnabx" sourceRef="Activity_1s4az3n" targetRef="Activity_01630p6" />
+      <bpmn:exclusiveGateway id="Gateway_0sy9ifb">
+        <bpmn:incoming>Flow_07c0v3z</bpmn:incoming>
+        <bpmn:outgoing>Flow_059v1xj</bpmn:outgoing>
+        <bpmn:outgoing>Flow_0fisilm</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="Flow_059v1xj" name="inConflict" sourceRef="Gateway_0sy9ifb" targetRef="Activity_1h73jir" />
+      <bpmn:task id="Activity_1h73jir" name="Insert/Update Room/Day In Conflict mark">
+        <bpmn:incoming>Flow_059v1xj</bpmn:incoming>
+        <bpmn:outgoing>Flow_146ombt</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:sequenceFlow id="Flow_0fisilm" name="not inConflict" sourceRef="Gateway_0sy9ifb" targetRef="Activity_1uefbch" />
+      <bpmn:task id="Activity_1uefbch" name="Remove Room/Day In Conflict mark">
+        <bpmn:incoming>Flow_0fisilm</bpmn:incoming>
+        <bpmn:outgoing>Flow_0o6w60m</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:task id="Activity_01630p6" name="Send requests to E360">
+        <bpmn:incoming>Flow_1lqnabx</bpmn:incoming>
+        <bpmn:outgoing>Flow_07c0v3z</bpmn:outgoing>
+      </bpmn:task>
+    </bpmn:subProcess>
+    <bpmn:textAnnotation id="TextAnnotation_1q7brff">
       <bpmn:text>Add POST request where event in CMIS but not E360
 Add PUT request where event is different in E360
 Add DEL request where event in E360 but not CMIS</bpmn:text>
     </bpmn:textAnnotation>
-    <bpmn:association id="Association_02yizdm" associationDirection="None" sourceRef="Activity_053ef1n" targetRef="TextAnnotation_0qkusmf" />
+    <bpmn:association id="Association_1n7mb5u" associationDirection="None" sourceRef="Activity_1s4az3n" targetRef="TextAnnotation_1q7brff" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1pdzon5">
       <bpmndi:BPMNShape id="Event_1oajb0x_di" bpmnElement="Event_1oajb0x">
-        <dc:Bounds x="152" y="132" width="36" height="36" />
+        <dc:Bounds x="152" y="162" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0njsxje_di" bpmnElement="Activity_0njsxje">
-        <dc:Bounds x="240" y="110" width="100" height="80" />
+      <bpmndi:BPMNShape id="Event_03zxaaf_di" bpmnElement="Event_03zxaaf">
+        <dc:Bounds x="1412" y="197" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0fk6wtr_di" bpmnElement="Activity_0fk6wtr" isExpanded="true">
+        <dc:Bounds x="260" y="80" width="1080" height="270" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1esxglx_di" bpmnElement="Activity_1esxglx">
-        <dc:Bounds x="400" y="110" width="100" height="80" />
+      <bpmndi:BPMNShape id="Event_0cm3cez_di" bpmnElement="Event_0cm3cez">
+        <dc:Bounds x="287" y="149" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_17lkvbr" bpmnElement="Activity_0qeu1uk">
+        <dc:Bounds x="365" y="127" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_053ef1n_di" bpmnElement="Activity_053ef1n">
-        <dc:Bounds x="560" y="110" width="100" height="80" />
+      <bpmndi:BPMNShape id="BPMNShape_0cr6bqx" bpmnElement="Activity_017sh1i">
+        <dc:Bounds x="525" y="127" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1hr3hnm_di" bpmnElement="Activity_1hr3hnm">
-        <dc:Bounds x="710" y="110" width="100" height="80" />
+      <bpmndi:BPMNShape id="BPMNShape_1pxeaah" bpmnElement="Gateway_0sy9ifb" isMarkerVisible="true">
+        <dc:Bounds x="990" y="142" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_00db2wu" bpmnElement="Activity_1h73jir">
+        <dc:Bounds x="1125" y="127" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_192xif1_di" bpmnElement="Gateway_192xif1" isMarkerVisible="true">
-        <dc:Bounds x="865" y="125" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0tadvng_di" bpmnElement="Activity_0tadvng">
-        <dc:Bounds x="1000" y="110" width="100" height="80" />
+      <bpmndi:BPMNShape id="BPMNShape_00cpdz1" bpmnElement="Activity_1s4az3n">
+        <dc:Bounds x="685" y="127" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0npthha_di" bpmnElement="Event_0npthha">
-        <dc:Bounds x="1152" y="132" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0kez8ld_di" bpmnElement="Activity_0kez8ld">
-        <dc:Bounds x="1000" y="210" width="100" height="80" />
+      <bpmndi:BPMNShape id="BPMNShape_0l3mj5l" bpmnElement="Activity_01630p6">
+        <dc:Bounds x="835" y="127" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Association_02yizdm_di" bpmnElement="Association_02yizdm">
-        <di:waypoint x="569" y="190" />
-        <di:waypoint x="536" y="222" />
+      <bpmndi:BPMNShape id="BPMNShape_0hu442p" bpmnElement="Event_1j7k9s3">
+        <dc:Bounds x="1277" y="149" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0grq6hl" bpmnElement="Activity_1uefbch">
+        <dc:Bounds x="1125" y="227" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_132fgxo_di" bpmnElement="Flow_132fgxo">
+        <di:waypoint x="323" y="167" />
+        <di:waypoint x="365" y="167" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0s1g2dm_di" bpmnElement="Flow_0s1g2dm">
-        <di:waypoint x="188" y="150" />
-        <di:waypoint x="240" y="150" />
+      <bpmndi:BPMNEdge id="BPMNEdge_0atr1uk" bpmnElement="Flow_160zv6j">
+        <di:waypoint x="465" y="167" />
+        <di:waypoint x="525" y="167" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0njk30k_di" bpmnElement="Flow_0njk30k">
-        <di:waypoint x="340" y="150" />
-        <di:waypoint x="400" y="150" />
+      <bpmndi:BPMNEdge id="BPMNEdge_0eppg8v" bpmnElement="Flow_0wwy50n">
+        <di:waypoint x="625" y="167" />
+        <di:waypoint x="685" y="167" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0znhzo6_di" bpmnElement="Flow_0znhzo6">
-        <di:waypoint x="500" y="150" />
-        <di:waypoint x="560" y="150" />
+      <bpmndi:BPMNEdge id="BPMNEdge_1nmlvgl" bpmnElement="Flow_07c0v3z">
+        <di:waypoint x="935" y="167" />
+        <di:waypoint x="990" y="167" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1xxggf0_di" bpmnElement="Flow_1xxggf0">
-        <di:waypoint x="660" y="150" />
-        <di:waypoint x="710" y="150" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1ul2urg_di" bpmnElement="Flow_1ul2urg">
-        <di:waypoint x="810" y="150" />
-        <di:waypoint x="865" y="150" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0zmnwol_di" bpmnElement="Flow_0zmnwol">
-        <di:waypoint x="915" y="150" />
-        <di:waypoint x="1000" y="150" />
+      <bpmndi:BPMNEdge id="BPMNEdge_00lvloj" bpmnElement="Flow_059v1xj">
+        <di:waypoint x="1040" y="167" />
+        <di:waypoint x="1125" y="167" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="934" y="132" width="47" height="14" />
+          <dc:Bounds x="1059" y="149" width="47" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_083enw6_di" bpmnElement="Flow_083enw6">
-        <di:waypoint x="1100" y="150" />
-        <di:waypoint x="1152" y="150" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_06lj7br_di" bpmnElement="Flow_06lj7br">
-        <di:waypoint x="890" y="175" />
-        <di:waypoint x="890" y="250" />
-        <di:waypoint x="1000" y="250" />
+      <bpmndi:BPMNEdge id="BPMNEdge_1xmq1bc" bpmnElement="Flow_0fisilm">
+        <di:waypoint x="1015" y="192" />
+        <di:waypoint x="1015" y="267" />
+        <di:waypoint x="1125" y="267" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="917" y="233" width="65" height="14" />
+          <dc:Bounds x="1042" y="250" width="65" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_055eh49_di" bpmnElement="Flow_055eh49">
-        <di:waypoint x="1100" y="250" />
-        <di:waypoint x="1121" y="250" />
-        <di:waypoint x="1121" y="150" />
-        <di:waypoint x="1152" y="150" />
+      <bpmndi:BPMNEdge id="BPMNEdge_00hyr2u" bpmnElement="Flow_146ombt">
+        <di:waypoint x="1225" y="167" />
+        <di:waypoint x="1277" y="167" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="TextAnnotation_0qkusmf_di" bpmnElement="TextAnnotation_0qkusmf">
-        <dc:Bounds x="470" y="222" width="330" height="55" />
+      <bpmndi:BPMNEdge id="BPMNEdge_168bryd" bpmnElement="Flow_1lqnabx">
+        <di:waypoint x="785" y="167" />
+        <di:waypoint x="835" y="167" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_0l1o89p" bpmnElement="Flow_0o6w60m">
+        <di:waypoint x="1225" y="267" />
+        <di:waypoint x="1246" y="267" />
+        <di:waypoint x="1246" y="167" />
+        <di:waypoint x="1277" y="167" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_1n7mb5u_di" bpmnElement="Association_1n7mb5u">
+        <di:waypoint x="735" y="210" />
+        <di:waypoint x="735" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1vwrwqy_di" bpmnElement="Flow_1vwrwqy">
+        <di:waypoint x="188" y="180" />
+        <di:waypoint x="260" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09a9vvn_di" bpmnElement="Flow_09a9vvn">
+        <di:waypoint x="1340" y="215" />
+        <di:waypoint x="1412" y="215" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_1q7brff_di" bpmnElement="TextAnnotation_1q7brff">
+        <dc:Bounds x="685" y="240" width="310" height="60" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
