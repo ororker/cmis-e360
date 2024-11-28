@@ -21,11 +21,9 @@
       <bpmn:outgoing>Flow_0njk30k</bpmn:outgoing>
     </bpmn:task>
     <bpmn:sequenceFlow id="Flow_055eh49" sourceRef="Activity_0kez8ld" targetRef="Event_0npthha" />
-    <bpmn:sequenceFlow id="Flow_06lj7br" sourceRef="Gateway_192xif1" targetRef="Activity_0kez8ld" />
     <bpmn:sequenceFlow id="Flow_083enw6" sourceRef="Activity_0tadvng" targetRef="Event_0npthha" />
     <bpmn:sequenceFlow id="Flow_0njk30k" sourceRef="Activity_0njsxje" targetRef="Activity_1esxglx" />
     <bpmn:sequenceFlow id="Flow_0s1g2dm" sourceRef="Event_1oajb0x" targetRef="Activity_0njsxje" />
-    <bpmn:sequenceFlow id="Flow_0zmnwol" sourceRef="Gateway_192xif1" targetRef="Activity_0tadvng" />
     <bpmn:sequenceFlow id="Flow_0znhzo6" sourceRef="Activity_1esxglx" targetRef="Activity_053ef1n" />
     <bpmn:sequenceFlow id="Flow_1ul2urg" sourceRef="Activity_1hr3hnm" targetRef="Gateway_192xif1" />
     <bpmn:sequenceFlow id="Flow_1xxggf0" sourceRef="Activity_053ef1n" targetRef="Activity_1hr3hnm" />
@@ -34,10 +32,12 @@
       <bpmn:outgoing>Flow_0zmnwol</bpmn:outgoing>
       <bpmn:outgoing>Flow_06lj7br</bpmn:outgoing>
     </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0zmnwol" name="inConflict" sourceRef="Gateway_192xif1" targetRef="Activity_0tadvng" />
     <bpmn:task id="Activity_0tadvng" name="Insert/Update Room/Day In Conflict mark">
       <bpmn:incoming>Flow_0zmnwol</bpmn:incoming>
       <bpmn:outgoing>Flow_083enw6</bpmn:outgoing>
     </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_06lj7br" name="not inConflict" sourceRef="Gateway_192xif1" targetRef="Activity_0kez8ld" />
     <bpmn:task id="Activity_0kez8ld" name="Remove Room/Day In Conflict mark">
       <bpmn:incoming>Flow_06lj7br</bpmn:incoming>
       <bpmn:outgoing>Flow_055eh49</bpmn:outgoing>
@@ -46,10 +46,6 @@
       <bpmn:incoming>Flow_1xxggf0</bpmn:incoming>
       <bpmn:outgoing>Flow_1ul2urg</bpmn:outgoing>
     </bpmn:task>
-    <bpmn:textAnnotation id="TextAnnotation_02406xe">
-      <bpmn:text>CMIS Room/Day events in conflict</bpmn:text>
-    </bpmn:textAnnotation>
-    <bpmn:association id="Association_1k4pw7l" associationDirection="None" sourceRef="Flow_0zmnwol" targetRef="TextAnnotation_02406xe" />
     <bpmn:textAnnotation id="TextAnnotation_0qkusmf">
       <bpmn:text>Add POST request where event in CMIS but not E360
 Add PUT request where event is different in E360
@@ -79,26 +75,22 @@ Add DEL request where event in E360 but not CMIS</bpmn:text>
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_192xif1_di" bpmnElement="Gateway_192xif1" isMarkerVisible="true">
-        <dc:Bounds x="855" y="125" width="50" height="50" />
+        <dc:Bounds x="865" y="125" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0tadvng_di" bpmnElement="Activity_0tadvng">
-        <dc:Bounds x="940" y="110" width="100" height="80" />
+        <dc:Bounds x="1000" y="110" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0npthha_di" bpmnElement="Event_0npthha">
-        <dc:Bounds x="1092" y="132" width="36" height="36" />
+        <dc:Bounds x="1152" y="132" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0kez8ld_di" bpmnElement="Activity_0kez8ld">
-        <dc:Bounds x="940" y="210" width="100" height="80" />
+        <dc:Bounds x="1000" y="210" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Association_02yizdm_di" bpmnElement="Association_02yizdm">
         <di:waypoint x="569" y="190" />
         <di:waypoint x="536" y="222" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Association_1k4pw7l_di" bpmnElement="Association_1k4pw7l">
-        <di:waypoint x="920" y="150" />
-        <di:waypoint x="920" y="112" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0s1g2dm_di" bpmnElement="Flow_0s1g2dm">
         <di:waypoint x="188" y="150" />
@@ -118,33 +110,35 @@ Add DEL request where event in E360 but not CMIS</bpmn:text>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1ul2urg_di" bpmnElement="Flow_1ul2urg">
         <di:waypoint x="810" y="150" />
-        <di:waypoint x="855" y="150" />
+        <di:waypoint x="865" y="150" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0zmnwol_di" bpmnElement="Flow_0zmnwol">
-        <di:waypoint x="905" y="150" />
-        <di:waypoint x="940" y="150" />
+        <di:waypoint x="915" y="150" />
+        <di:waypoint x="1000" y="150" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="934" y="132" width="47" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_083enw6_di" bpmnElement="Flow_083enw6">
-        <di:waypoint x="1040" y="150" />
-        <di:waypoint x="1092" y="150" />
+        <di:waypoint x="1100" y="150" />
+        <di:waypoint x="1152" y="150" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_06lj7br_di" bpmnElement="Flow_06lj7br">
-        <di:waypoint x="880" y="175" />
-        <di:waypoint x="880" y="250" />
-        <di:waypoint x="940" y="250" />
+        <di:waypoint x="890" y="175" />
+        <di:waypoint x="890" y="250" />
+        <di:waypoint x="1000" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="917" y="233" width="65" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_055eh49_di" bpmnElement="Flow_055eh49">
-        <di:waypoint x="1040" y="250" />
-        <di:waypoint x="1061" y="250" />
-        <di:waypoint x="1061" y="150" />
-        <di:waypoint x="1092" y="150" />
+        <di:waypoint x="1100" y="250" />
+        <di:waypoint x="1121" y="250" />
+        <di:waypoint x="1121" y="150" />
+        <di:waypoint x="1152" y="150" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="TextAnnotation_0qkusmf_di" bpmnElement="TextAnnotation_0qkusmf">
         <dc:Bounds x="470" y="222" width="330" height="55" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="TextAnnotation_02406xe_di" bpmnElement="TextAnnotation_02406xe">
-        <dc:Bounds x="835" y="72" width="125" height="40" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
