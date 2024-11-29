@@ -16,9 +16,61 @@ SpaceTT2
 2. could we update every minute in the expectation that few clashes will occur and repair clashes over-night with batch?
 3. when will E360 report a clash? 
 
-## Challenges in integrating to Echo360 from CMIS
-One of the most challenging aspects of integrating CMIS to Echo360 is that E360 does not support invalid
-timetables.
+## Introduction
+
+The purpose of this document is to describe a design to support the 
+integration of Glasgow University's Timetabling system (CMIS) and their
+audio and visual lesson recording system Echo360 (E360).
+
+The integration will be one way from CMIS to e360, 
+and will include passing all timetable information for lessons that 
+require video or audio recording and supporting information such as 
+lecturer, course and room details. Where E360 is not aware of
+supporting details, these details will submitted to E360 before
+submitting the timetable information.
+
+The 2 largest challenges to overcome with this integration are:
+1. CMIS TIMETABLE table contains one row that specifies details of a lesson across multiple weeks. The main entity within E360 has a row for each lesson, therefore when the  column in CMIS that specifies the weeks this row's details relate to changes then multiple updates (inserts/updates/deletes) may need to be communicated to E360.
+2. CMIS permits the timetable data to be in an inconsistent state, i.e. more than one lesson can be scheduled to take place in the same room at the same time. E360 has constraints that don't allow such conflicts to exist, therefore we need a strategy to support dealing with such situations.
+
+### Different data model structures
+
+The data models used by CMIS and E360 differ in one very distinct aspect,
+namely how they represent lessons.
+
+In E360 the main entity is called SCHEDULE and it represents
+one lesson, taking place in a particular room and at a particular date and time.
+
+In CMIS the main entity is called TIMETABLE.
+This represents a set of lessons taking place in a particular room and
+at a particular time and day of the week but across
+1 or more weeks.
+
+<details>
+<summary>Developer Note</summary>
+
+NB even though multiple rows within TIMETABLE can have the same SETID and SLOTID, (but with different SLOTENTRY values)
+each SETID and SLOTID combination always have the same WEEKID and WEEKDAY values.
+</details>
+
+When publishing CMIS schedule information to E360 a REST API must be used.
+Due to the data model structures mentioned above when a change is made to one
+row in CMIS, many REST API calls may need to be made to the E360 REST API in order to keep
+the schedules in sync.
+
+### Handling inconsistent states in CMIS
+
+Information will only be propagated from CMIS to E360 when the necessary data items have been entered, i.e.
+the date, time, room, lecturer and course. While the timetable is being developed, timetablers can specify 
+that a lesson will take place at the same time and place as another lesson. 
+If we were to send details of both lessons to E360 then E360 would reject the latter. 
+Subsequently if the former were to be rescheduled in CMIS to a different room, and we sent that update to E360,
+how would CMIS know to re-send details of the lesson that was previously rejected.
+
+There are many such scenarios where CMIS can move into and out of inconsistent states. 
+Please see the [Scenarios page](./scenarios.md) for details.
+
+This document will describe a strategy for handling these inconsistent states.
 
 ### No of rooms E360 is used in (23/24): 198
 The following sql was used to identify all of the rooms with audio/visual equipment used for lectures in 2023/4
@@ -47,28 +99,6 @@ order by 3 desc, 1, 2;
 The most used room was 203 Lec Theatre 1, Boyd Orr (ID=2950203) that was used 766 times.
 
 There are 198 rooms with audio/visual equipment.
-
-
-## Different data model structures
-
-The data models used by CMIS and E360 differ in one very distinct aspect,
-namely how they represent classes.
-
-In E360 the main entity is called SCHEDULE and it represents
-one lesson, taking place in a particular room and at a particular date and time.
-
-In CMIS the main entity is called TIMETABLE. 
-This represents a set of classes taking place in a particular room and 
-at a particular time and day of the week but across 
-1 or more weeks. 
-
-NB even though multiple rows within TIMETABLE can have the same SETID and SLOTID, (but with different SLOTENTRY values)
-each SETID and SLOTID combination always have the same WEEKID and WEEKDAY values.
-
-When publishing CMIS schedule information to E360 a REST API must be used.
-Due to the data model structures mentioned above when a change is made to one 
-row in CMIS, many REST API calls may need to be made to the E360 REST API in order to keep
-the schedules in sync.
 
 ## Criteria for sending schedule information to E360
 
