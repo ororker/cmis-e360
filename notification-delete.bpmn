@@ -4,7 +4,7 @@
     <bpmn:endEvent id="Event_16mjtlv">
       <bpmn:incoming>Flow_1quyqpo</bpmn:incoming>
       <bpmn:incoming>Flow_1dhms5c</bpmn:incoming>
-      <bpmn:incoming>Flow_19v0x0c</bpmn:incoming>
+      <bpmn:incoming>Flow_05l5e2i</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:intermediateThrowEvent id="Event_194spgz" name="On delete notification">
       <bpmn:outgoing>Flow_05rcptq</bpmn:outgoing>
@@ -54,7 +54,12 @@
       <bpmn:outgoing>Flow_19v0x0c</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_1yxvp1w" name="${after}" sourceRef="Gateway_1ge4v7n" targetRef="Gateway_1vq2da4" />
-    <bpmn:sequenceFlow id="Flow_19v0x0c" name="${!after}" sourceRef="Gateway_1ge4v7n" targetRef="Event_16mjtlv" />
+    <bpmn:sequenceFlow id="Flow_19v0x0c" name="${!after}" sourceRef="Gateway_1ge4v7n" targetRef="Activity_1kyjc9v" />
+    <bpmn:task id="Activity_1kyjc9v" name="Mark notification row as out of date">
+      <bpmn:incoming>Flow_19v0x0c</bpmn:incoming>
+      <bpmn:outgoing>Flow_05l5e2i</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_05l5e2i" sourceRef="Activity_1kyjc9v" targetRef="Event_16mjtlv" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1pdzon5">
@@ -94,6 +99,10 @@
           <dc:Bounds x="395" y="222" width="90" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1kyjc9v_di" bpmnElement="Activity_1kyjc9v">
+        <dc:Bounds x="950" y="60" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_05rcptq_di" bpmnElement="Flow_05rcptq">
         <di:waypoint x="218" y="190" />
         <di:waypoint x="250" y="190" />
@@ -117,10 +126,9 @@
       <bpmndi:BPMNEdge id="Flow_19v0x0c_di" bpmnElement="Flow_19v0x0c">
         <di:waypoint x="440" y="165" />
         <di:waypoint x="440" y="100" />
-        <di:waypoint x="1120" y="100" />
-        <di:waypoint x="1120" y="172" />
+        <di:waypoint x="950" y="100" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="761" y="82" width="39" height="14" />
+          <dc:Bounds x="731" y="82" width="39" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_1mhco6l" bpmnElement="Flow_14c0vuq">
@@ -159,6 +167,11 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="502" y="172" width="36" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_05l5e2i_di" bpmnElement="Flow_05l5e2i">
+        <di:waypoint x="1050" y="100" />
+        <di:waypoint x="1120" y="100" />
+        <di:waypoint x="1120" y="172" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
