@@ -18,8 +18,7 @@ When an event is received:
 |----|------|-------|------|--------|
 | 2  | 1    | 1000  | 1100 | I      |
 
-Then an POST request will be sent to e360
-And the e360 schedule will be as follows:
+Then the e360 schedule will be as follows:
 
 | id | room | start | end  |
 |----|------|-------|------|
@@ -108,7 +107,7 @@ Then the e360 schedule will be as follows:
 
 [//]: # (The Room/Day will then be refreshed resulting in DEL requests being sent to e360 for events 1 & 2)
 
-[//]: # (and because of the conflict at 1000 the Room/Day will be marked as In Conflict)
+[//]: # (and because of the conflict at 0900 the Room/Day will be marked as In Conflict)
 
 # From no-conflict to conflict after event updated to conflict with existing event
 
@@ -160,12 +159,13 @@ When an event is received:
 
 | id | room | start | end  | action | 
 |----|------|-------|------|--------|
-| 1  | 1    | 0900  | 1000 | D      |
+| 1  | 1    | 1000  | 1100 | D      |
 
 Then the e360 schedule will be as follows:
 
-| id | room | start | end |
-|----|------|-------|-----|
+| id | room | start | end  |
+|----|------|-------|------|
+| 2  | 1    | 1000  | 1100 |
 
 # From conflict to no-conflict with one event updated
 
@@ -185,7 +185,7 @@ When events are received:
 
 | id | room | start | end  | action | 
 |----|------|-------|------|--------|
-| 2  | 1    | 1100  | 1200 | U      |
+| 1  | 1    | 0900  | 1000 | U      |
 
 Then a POST request will be sent to e360 for events 1 & 2
 And the e360 schedule will be as follows:
@@ -193,7 +193,7 @@ And the e360 schedule will be as follows:
 | id | room | start | end  |
 |----|------|-------|------|
 | 1  | 2    | 0900  | 1000 |
-| 2  | 2    | 1100  | 1200 |
+| 2  | 2    | 1000  | 1100 |
 
 # From conflict to no-conflict with one event updated to a different room
 
@@ -252,7 +252,7 @@ And the e360 schedule will be as follows:
 | 1  | 1    | 0900  | 1000 |
 | 2  | 2    | 1100  | 1200 |
 
-# From conflict to no-conflict within the same room, with two events moving
+# From conflict to no-conflict with two events moving within the same room
 
 Given the cmis schedule is as follows:
 
@@ -362,7 +362,6 @@ And the e360 schedule will be as follows:
 | id | room | start | end |
 |----|------|-------|-----|
 
-
 # From conflict to conflict with one event updated to clash with a different event
 
 Given the cmis schedule is as follows:
@@ -375,8 +374,8 @@ Given the cmis schedule is as follows:
 
 And the e360 schedule is as follows: // due to previous conflict events were deleted
 
-| id | room | start | end |
-|----|------|-------|-----|
+| id | room | start | end  |
+|----|------|-------|------|
 | 3  | 1    | 1100  | 1200 |
 
 When an event is received:
@@ -388,11 +387,11 @@ When an event is received:
 Then a POST request will be sent to e360 for events 1 & 2
 And the e360 schedule will be as follows:
 
-| id | room | start | end |
-|----|------|-------|-----|
+| id | room | start | end  |
+|----|------|-------|------|
 | 1  | 1    | 1000  | 1100 |
 
-# From conflict to conflict both events moving to a different room
+# From conflict to conflict with both events moving to a different room
 
 Given the cmis schedule is as follows:
 
@@ -491,7 +490,7 @@ And e360 schedule remains as follows:
 | id | room | start | end |
 |----|------|-------|-----|
 
-# From conflict to conflict a new event is added not conflicting
+# From conflict to conflict with one event inserted at non conflicting time
 
 Given the cmis schedule is as follows:
 
@@ -518,7 +517,7 @@ And e360 schedule remains as follows:
 |----|------|-------|------|
 | 3  | 1    | 1000  | 1100 |
 
-# From conflict to conflict a new event is added initially not conflicting and then moved to conflict
+# From conflict to conflict with one event inserted initially not conflicting and then moved to conflict
 
 Given the cmis schedule is as follows:
 
