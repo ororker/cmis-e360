@@ -1,4 +1,4 @@
-# CMIS to Echo360 Integration Scenarios 
+# CMIS to Echo360 Integration Scenarios
 
 ## Insert from CMIS
 
@@ -500,5 +500,33 @@ When events are received:
 | 3  | 1    | 0900  | 1000 | U      |
 
 And e360 schedule remains as follows:
+
 | id | room | start | end |
+|----|------|-------|-----|
+
+## From conflict to conflict with one event inserted initially conflicting and then moved to non-conflicting
+
+Given the cmis schedule is as follows:
+
+| id | room | start | end  |
 |----|------|-------|------|
+| 1  | 1    | 0900  | 1000 |
+| 2  | 1    | 0900  | 1000 |
+
+And the e360 schedule is as follows:
+
+| id | room | start | end |
+|----|------|-------|-----|
+
+When events are received:
+
+| id | room | start | end  | action | 
+|----|------|-------|------|--------|
+| 3  | 1    | 0900  | 1000 | I      |
+| 3  | 1    | 1000  | 1100 | U      |
+
+And e360 schedule remains as follows:
+
+| id | room | start | end  |
+|----|------|-------|------|
+| 3  | 1    | 1000  | 1100 |
