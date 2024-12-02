@@ -73,9 +73,24 @@ The criteria above is an interpretation of the logic used the SpaceTT code `Test
 If the data supplied to the trigger does not meet the criteria then it will be ignored.
 
 ### On Insert
+When the insert trigger on the TIMETABLE table is triggered the first thing it will do is assess whether the row meets the criteria described above to allow it to be sent to E360.
+If it does not meet the criteria it will be considered `invalid` and no further processing on it will take place. 
 
+If it is valid then for each week associated with the `weekid` a sub-process will be initiated to propagate the update for that week.
+Each update sent to E360 relies upon E360 being aware of the associated reference data, e.g. the course, room and lecturer data, and if E360 is not aware of this data then this process will update E360 with this data.
+
+In the event that E360 already has a lesson scheduled for a particular room and date/time, E360 will respond with the error `Venue / Time slot is already taken`. 
+An attempt will now be made to refresh all scheduled events on this particular day in the room that is clashing.
+If a conflict still exists then a row will then be inserted into the STT_ECHO_DAY_ROOM_CONFLICT table.
+When subsequent notifications are received for this room/day then a further full Room/Day refresh will take place, until the scheduling conflict is resolved.
+
+![Insert Workflow](img/insert.png)
+
+![Insert Notification Workflow](img/notification-insert.png)
 
 ### On Update
+
+
 
 
 ### On Delete
@@ -243,6 +258,7 @@ did meet the criteria requiring it to be sent to E360 is:
 - the most recent of these rows must have an action of INSERT or UPDATE (not DELETE). 
 
 
+
 ## DB Table STT_ECHO_QUEUE
 To support the integration with E360 a new table will be created.
 
@@ -272,6 +288,52 @@ To support the integration with E360 a new table will be created.
 | ROOMREQUESTS   | FEATUREID     | VARCHAR2(10)  |                                                     |
 
 NB We don't need the slot entry because it is always 1.
+
+
+## DB Table STT_ECHO_DAY_ROOM_CONFLICT
+To support the integration with E360 a new table will be created.
+
+| SOURCE         | NAME        | TYPE          | DESC                                                |
+|----------------|-------------|---------------|-----------------------------------------------------|
+| TIMETABLE      | ID          | NUMBER        | Sequence SEQ_STT_ECHO_QUEUE                         |
+|                | CREATED     | DATE          | Date/timestamp when row was inserted                |
+|                | RESOLVED    | DATE          | Date/timestamp when row was processed               |
+| TIMETABLE      | LESSON_DATE | VARCHAR2(16)  |                                                     |
+| TIMETABLE      | ROOMID      | VARCHAR2(16)  |                                                     |
+| TIMETABLE      | ROOMGRPCODE | VARCHAR2(12)  |                                                     |
+
+
+## DB Table STT_ECHO_NOTIFICATION
+ To support the integration with E360 a new table will be created.
+
+| SOURCE         | NAME          | TYPE          | DESC                                                |
+|----------------|---------------|---------------|-----------------------------------------------------|
+| TIMETABLE      | ID            | NUMBER        | Sequence SEQ_STT_ECHO_QUEUE                         |
+| TIMETABLE      | OLD_VALID     | BOOLEAN       | Calc from OLD values passed to trigger              |
+| TIMETABLE      | NEW_VALID     | BOOLEAN       | Calc from NEW values passed to trigger              |
+|                | CREATED       | DATE          | Date/timestamp when row was inserted                |
+|                | PROCESSED     | DATE          | Date/timestamp when row was processed               |
+|                | STATUS        | VARCHAR(1)    | [UNPROCESSED \| IN_PROGRESS \| PROCESSED \| FAILED] |
+|                | ERROR         | VARCHAR2(100) | A description of the error                          |
+| TIMETABLE      | ACTION        | VARCHAR(1)    | The type of request to be sent to E360: [I\|U\|D]   |
+| TIMETABLE      | SETID         | VARCHAR2(10)  |                                                     |
+| TIMETABLE      | SLOTID        | NUMBER        |                                                     |
+| TIMETABLE      | WEEKID_OLD    | NUMBER        |                                                     |
+| TIMETABLE      | WEEKID_NEW    | NUMBER        |                                                     |
+| TIMETABLE      | WEEKDAY       | NUMBER        |                                                     |
+| TIMETABLE      | STARTTIME     | VARCHAR2(5)   |                                                     |
+| TIMETABLE      | FINISHTIME    | VARCHAR2(5)   |                                                     |
+| TIMETABLE      | MODULEID      | VARCHAR2(20)  |                                                     |
+| TIMETABLE      | MODGRPCODE    | VARCHAR2(10)  |                                                     |
+| TIMETABLE      | ROOMID        | VARCHAR2(16)  |                                                     |
+| TIMETABLE      | ROOMGRPCODE   | VARCHAR2(12)  |                                                     |
+| TIMETABLE      | LECTURERID    | VARCHAR2(10)  |                                                     |
+| STT_EXT_PERSON | BUSINESSEMAIL | VARCHAR2(80)  | TODO replace lookup in STT table with a CMIS table  |
+| ROOMREQUESTS   | FEATUREID     | VARCHAR2(10)  |                                                     |
+
+NB We don't need the slot entry because it is always 1.
+
+
 
 ## Spring CRON job
 
