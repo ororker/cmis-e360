@@ -22,18 +22,66 @@ The purpose of this document is to describe a design to support the
 integration of Glasgow University's Timetabling system (CMIS) and their
 audio and visual lesson recording system Echo360 (E360).
 
-The integration will be one way from CMIS to e360, 
+The integration will be one way, from CMIS to e360, 
 and will include passing all timetable information for lessons that 
 require video or audio recording and supporting information such as 
 lecturer, course and room details. Where E360 is not aware of
 supporting details, these details will submitted to E360 before
 submitting the timetable information.
 
-The 2 largest challenges to overcome with this integration are:
-1. CMIS TIMETABLE table contains one row that specifies details of a lesson across multiple weeks. The main entity within E360 has a row for each lesson, therefore when the  column in CMIS that specifies the weeks this row's details relate to changes then multiple updates (inserts/updates/deletes) may need to be communicated to E360.
-2. CMIS permits the timetable data to be in an inconsistent state, i.e. more than one lesson can be scheduled to take place in the same room at the same time. E360 has constraints that don't allow such conflicts to exist, therefore we need a strategy to support dealing with such situations.
+The integration is complicated by the systems holding the data in different data structures and applying different constraints to determine what is valid data.
+
+### Different constraints
+The first challenge to integrating the 2 systems is that 
+while the timetable is being developed within CMIS it is possible for it to be in an "invalid" state, such that it may record that 2 different lessons will be taught at the same time, in the same room by different lecturers and for different courses.
+
+In contrast E360 has constraints that will not allow the timetable it holds to be in an "invalid" state. If an event is scheduled within E360 to be in a room at a certain date and time and it is notified of another event taking place at the same date and time then it will reject the second notification. For the second notification to be accepted the original event must be updated to be in a different time or place or be deleted.
 
 ### Different data model structures
+The second challenge to integrating the 2 systems is that the main table within the CMIS 
+system has one row represent a lesson, at a particular time and duration, in the same room, for the same course and given by the same lecturer across 1 or more weeks.
+
+In contrast the main table within the E360 system has one row represent a lesson on a particular date rather than a set of dates.
+
+The impact of this is that one change within CMIS can result in multiple changes to E360 and due to the [different constraints](Different constraints) some of these updates may be successful while others could fail.
+
+
+## Integration Workflow
+The integration from CMIS to E360 will be event driven.
+The events will be initiated by insert, update and delete triggers that will be applied to CMIS's TIMETABLE table.
+These triggers will result in a row being written to the table STT_ECHO_QUEUE when the data supplied to the trigger meets certain criteria.
+A Springframework CRON process running in a new component SpaceTT2, will then read and process each of these rows in the order that they were written.
+
+### Criteria for sending schedule information to E360
+
+When a TIMETABLE entry is inserted, updated or deleted, it is only of interest to E360 if it meets the following criteria:
+- the TIMETABLE column SOURCESID must have value 'TEACH'
+- the TIMETABLE column STATUS must have value '2'
+- the TIMETABLE column SLOTENTRY must have value '1'
+- the TIMETABLE column ROOMID must be non-null
+- a row must exist in MODULE table with the same (SETID, MODULEID)
+- a row must exist in MODULEGROUPS with matching (SETID, MODULEID) and the first 2 chars of MODULEGROUPS.GRPCODE must match a row in STT_COMPONENT_TYPE.MODULE_SUBGROUP_CODE
+- the MODULEGROUPS.GRPCODE value from above must have a length of 4 and characters 3 and 4 must be digits.
+- a row must exist in ROOMREQUESTS with matching (SETID) and FEATUREID must have value 'AUDIOREC' or 'VIDEOREC'.
+- a row must exist in ROOMFEATURES with matching (SETID, ROOMID) and FEATUREID must have value 'AUDIOREC' or 'VIDEOREC'.
+
+<details>
+<summary>Developer Note</summary>
+The criteria above is an interpretation of the logic used the SpaceTT code `TestWorkloadExtractService#testProduceEchoExtract`.
+</details>
+
+If the data supplied to the trigger does not meet the criteria then it will be ignored.
+
+### On Insert
+
+
+### On Update
+
+
+### On Delete
+
+
+has the TIMETABLE table as its main data structure and it contains one row that specifies details of a lesson across multiple weeks. The main entity within E360 has a row for each lesson, therefore when the  column in CMIS that specifies the weeks this row's details relate to changes then multiple updates (inserts/updates/deletes) may need to be communicated to E360.
 
 The data models used by CMIS and E360 differ in one very distinct aspect,
 namely how they represent lessons.
@@ -100,21 +148,6 @@ The most used room was 203 Lec Theatre 1, Boyd Orr (ID=2950203) that was used 76
 
 There are 198 rooms with audio/visual equipment.
 
-## Criteria for sending schedule information to E360
-
-When a TIMETABLE entry is inserted or updated, it is only of interest to E360 if it meets the following criteria:
-- the TIMETABLE column SOURCESID must have value 'TEACH'
-- the TIMETABLE column STATUS must have value '2'
-- the TIMETABLE column SLOTENTRY must have value '1'
-- the TIMETABLE column ROOMID must be non-null
-- a row must exist in MODULE table with the same (SETID, MODULEID)
-- a row must exist in ROOMREQUESTS with matching (SETID) and FEATUREID must have value 'AUDIOREC' or 'VIDEOREC'.
-- a row must exist in ROOMFEATURES with matching (SETID, ROOMID) and FEATUREID must have value 'AUDIOREC' or 'VIDEOREC'.
-- a row must exist in MODULEGROUPS with matching (SETID, MODULEID) and the first 2 chars of MODULEGROUPS.GRPCODE must match a row in STT_COMPONENT_TYPE.MODULE_SUBGROUP_CODE
-- the MODULEGROUPS.GRPCODE value from above must have a length of 4 and characters 3 and 4 must be digits.
-
-The criteria above is an interpretation of the logic used the SpaceTT code `TestWorkloadExtractService#testProduceEchoExtract`.
-
 ## Scenarios
 
 The CMIS analysis identified 9 scenarios that need to be considered when transferring data from CMIS to E360.
@@ -168,7 +201,7 @@ a DELETE request must be sent to E360.
 
 ### Cancel schedule - previously met criteria
 
-When a schedule previously met the criteria and is cancelled a DELETE request myst be sent to E360.
+When a schedule previously met the criteria and is cancelled a DELETE request must be sent to E360.
 
 ### Cancel schedule - previously did not meet criteria 
 
@@ -213,28 +246,30 @@ did meet the criteria requiring it to be sent to E360 is:
 ## DB Table STT_ECHO_QUEUE
 To support the integration with E360 a new table will be created.
 
-| SOURCE         | NAME          | TYPE          | DESC                                              |
-|----------------|---------------|---------------|---------------------------------------------------|
-| TIMETABLE      | ID            | NUMBER        | Sequence SEQ_STT_ECHO_QUEUE                       |
-|                | CREATED       | DATE          | Date/timestamp when row was inserted              |
-|                | PROCESSED     | DATE          | Date/timestamp when row was processed             |
-|                | STATUS        | VARCHAR(1)    | [UNPROCESSED\|IN_PROGRESS \| PROCESSED \| FAILED] |
-|                | ERROR         | VARCHAR2(100) | A description of the error                        |
-| TIMETABLE      | ACTION        | VARCHAR(1)    | The type of request to be sent to E360: [I\|U\|D] |
-| TIMETABLE      | SETID         | VARCHAR2(10)  |                                                   |
-| TIMETABLE      | SLOTID        | NUMBER        |                                                   |
-| TIMETABLE      | WEEKID_OLD    | NUMBER        |                                                   |
-| TIMETABLE      | WEEKID_NEW    | NUMBER        |                                                   |
-| TIMETABLE      | WEEKDAY       | NUMBER        |                                                   |
-| TIMETABLE      | STARTTIME     | VARCHAR2(5)   |                                                   |
-| TIMETABLE      | FINISHTIME    | VARCHAR2(5)   |                                                   |
-| TIMETABLE      | MODULEID      | VARCHAR2(20)  |                                                   |
-| TIMETABLE      | MODGRPCODE    | VARCHAR2(10)  |                                                   |
-| TIMETABLE      | ROOMID        | VARCHAR2(16)  |                                                   |
-| TIMETABLE      | ROOMGRPCODE   | VARCHAR2(12)  |                                                   |
-| TIMETABLE      | LECTURERID    | VARCHAR2(10)  |                                                   |
-| STT_EXT_PERSON | BUSINESSEMAIL | VARCHAR2(80)  |                                                   |
-| ROOMREQUESTS   | FEATUREID     | VARCHAR2(10)  |                                                   |
+| SOURCE         | NAME          | TYPE          | DESC                                                |
+|----------------|---------------|---------------|-----------------------------------------------------|
+| TIMETABLE      | ID            | NUMBER        | Sequence SEQ_STT_ECHO_QUEUE                         |
+| TIMETABLE      | OLD_VALID     | BOOLEAN       | Calc from OLD values passed to trigger              |
+| TIMETABLE      | NEW_VALID     | BOOLEAN       | Calc from NEW values passed to trigger              |
+|                | CREATED       | DATE          | Date/timestamp when row was inserted                |
+|                | PROCESSED     | DATE          | Date/timestamp when row was processed               |
+|                | STATUS        | VARCHAR(1)    | [UNPROCESSED \| IN_PROGRESS \| PROCESSED \| FAILED] |
+|                | ERROR         | VARCHAR2(100) | A description of the error                          |
+| TIMETABLE      | ACTION        | VARCHAR(1)    | The type of request to be sent to E360: [I\|U\|D]   |
+| TIMETABLE      | SETID         | VARCHAR2(10)  |                                                     |
+| TIMETABLE      | SLOTID        | NUMBER        |                                                     |
+| TIMETABLE      | WEEKID_OLD    | NUMBER        |                                                     |
+| TIMETABLE      | WEEKID_NEW    | NUMBER        |                                                     |
+| TIMETABLE      | WEEKDAY       | NUMBER        |                                                     |
+| TIMETABLE      | STARTTIME     | VARCHAR2(5)   |                                                     |
+| TIMETABLE      | FINISHTIME    | VARCHAR2(5)   |                                                     |
+| TIMETABLE      | MODULEID      | VARCHAR2(20)  |                                                     |
+| TIMETABLE      | MODGRPCODE    | VARCHAR2(10)  |                                                     |
+| TIMETABLE      | ROOMID        | VARCHAR2(16)  |                                                     |
+| TIMETABLE      | ROOMGRPCODE   | VARCHAR2(12)  |                                                     |
+| TIMETABLE      | LECTURERID    | VARCHAR2(10)  |                                                     |
+| STT_EXT_PERSON | BUSINESSEMAIL | VARCHAR2(80)  | TODO replace lookup in STT table with a CMIS table  |
+| ROOMREQUESTS   | FEATUREID     | VARCHAR2(10)  |                                                     |
 
 NB We don't need the slot entry because it is always 1.
 
