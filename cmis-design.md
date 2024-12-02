@@ -39,17 +39,20 @@ In contrast E360 has constraints that will not allow the timetable it holds to b
 
 ### Different data model structures
 The second challenge to integrating the 2 systems is that the main table within the CMIS 
-system has one row represent a lesson, at a particular time and duration, in the same room, for the same course and given by the same lecturer across 1 or more weeks.
+system has one row represent a lesson 1 **or more weeks**.
 
-In contrast the main table within the E360 system has one row represent a lesson on a particular date rather than a set of dates.
+In contrast, the main table within the E360 system has one row represent a lesson strictly on 1 week rather than on a set of weeks.
 
-The impact of this is that one change within CMIS can result in multiple changes to E360 and due to the [different constraints](Different constraints) some of these updates may be successful while others could fail.
+The impact of this is that one change within CMIS can result in multiple changes to E360 and due to the [different constraints](#Different constraints) some of these updates may be successful while others could fail.
 
 
 ## Integration Workflow
 The integration from CMIS to E360 will be event driven.
 The events will be initiated by insert, update and delete triggers that will be applied to CMIS's TIMETABLE table.
-These triggers will result in a row being written to the table STT_ECHO_QUEUE when the data supplied to the trigger meets certain criteria.
+These triggers will result in a row being written to the table STT_ECHO_QUEUE when the data supplied to the trigger meets certain criteria as defined in [Criteria for sending schedule information to E360](#Criteria for sending schedule information to E360).
+The work performed in the triggers will be kept to a minimum so as not to impact the
+performance of CMIS generally.
+
 A Springframework CRON process running in a new component SpaceTT2, will then read and process each of these rows in the order that they were written.
 
 ### Criteria for sending schedule information to E360
@@ -70,17 +73,15 @@ When a TIMETABLE entry is inserted, updated or deleted, it is only of interest t
 The criteria above is an interpretation of the logic used the SpaceTT code `TestWorkloadExtractService#testProduceEchoExtract`.
 </details>
 
-If the data supplied to the trigger does not meet the criteria then it will be ignored.
-
 ### On Insert
 When the insert trigger on the TIMETABLE table is triggered the first thing it will do is assess whether the row meets the criteria described above to allow it to be sent to E360.
-If it does not meet the criteria it will be considered `invalid` and no further processing on it will take place. 
+If it does not meet the criteria then no further processing on it will take place within this trigger.
 
-If it is valid then for each week associated with the `weekid` a sub-process will be initiated to propagate the update for that week.
-Each update sent to E360 relies upon E360 being aware of the associated reference data, e.g. the course, room and lecturer data, and if E360 is not aware of this data then this process will update E360 with this data.
+If it is valid then for each week associated with the CMIS row a sub-process will be initiated to propagate the insert for that week.
+Each update sent to E360 relies upon E360 being aware of the associated reference data, e.g. the course, room and lecturer data, and if E360 is not aware of this data then the request will fail. The failure message will indicate which piece of reference data is missing and the process will update E360 with this reference data before re-sending the initial request.
 
 In the event that E360 already has a lesson scheduled for a particular room and date/time, E360 will respond with the error `Venue / Time slot is already taken`. 
-An attempt will now be made to refresh all scheduled events on this particular day in the room that is clashing.
+An attempt will now be made to refresh all scheduled events on this particular day in the room that has the clash.
 If a conflict still exists then a row will then be inserted into the STT_ECHO_DAY_ROOM_CONFLICT table.
 When subsequent notifications are received for this room/day then a further full Room/Day refresh will take place, until the scheduling conflict is resolved.
 
@@ -90,36 +91,50 @@ When subsequent notifications are received for this room/day then a further full
 
 ### On Update
 
+When the update trigger on the TIMETABLE table is triggered it has access to the new and old versions of the row.
+It accesses whether or not the old and or the new versions of the row meet the criteria to allow it to be sent to E360.
+If both the old and the new versions do not meet the criteria then no further processing on it will take place within this trigger, otherwise the details of the update will be inserted into the table `STT_ECHO_QUEUE`.
 
+The details will then be read by a java process which will firstly determine what combination of 
+insert, update and delete notifications need to be sent to E360 to synchronize it with the data in CMIS.
+These notifications will then be persisted to the table STT_ECHO_NOTIFICATION.
+
+In the most common scenario the corresponding POST, PUT, DELETE requests will be sent to E360 successfully.
+As mentioned in the On Insert scenario, an error could occur where reference data is missing and 
+this will be rectified by supplying E360 with the reference data and then retrying the request. 
+
+In the scenario where E360 responds with a `Venue / Time slot is already taken` error
+then the process will attempt refresh the data in E360 with the latest data in CMIS for 
+a particular room and day.
+
+Where a different error is received then user intervention will be required to resolve
+the issue. A list of the notifications that failed will
+be displayed on the admin screen. 
+When Administrators deem that the underlying issue for a notification 
+failure has been resolved then they will be able to trigger
+a refresh of the Room/Day data to E360.
+
+![Update Workflow](img/update.png)
+
+![Update Notification Workflow](img/notification-update.png)
 
 
 ### On Delete
 
+When the delete trigger on the TIMETABLE table is triggered it has access to the old version of the row, i.e. the data that is being deleted.
+It accesses whether the old version of the row meet the criteria to allow it to be sent to E360.
+If it did not then no further processing will take place within this trigger, otherwise the details of the delete will be inserted into the table `STT_ECHO_QUEUE`.
 
-has the TIMETABLE table as its main data structure and it contains one row that specifies details of a lesson across multiple weeks. The main entity within E360 has a row for each lesson, therefore when the  column in CMIS that specifies the weeks this row's details relate to changes then multiple updates (inserts/updates/deletes) may need to be communicated to E360.
+Similar to how On Insert notifications were handled, the majority of notifications will be handled by sending
+a REST API call to E360, in this case with an HTTP method of DELETE.
 
-The data models used by CMIS and E360 differ in one very distinct aspect,
-namely how they represent lessons.
+Where the Room/Day is already in conflict then as long as the notification wasn't received prior to the
+last time that the room/day was refreshed then the room day will be refreshed.
 
-In E360 the main entity is called SCHEDULE and it represents
-one lesson, taking place in a particular room and at a particular date and time.
+![Delete Workflow](img/delete.png)
 
-In CMIS the main entity is called TIMETABLE.
-This represents a set of lessons taking place in a particular room and
-at a particular time and day of the week but across
-1 or more weeks.
+![Delete Notification Workflow](img/notification-delete.png)
 
-<details>
-<summary>Developer Note</summary>
-
-NB even though multiple rows within TIMETABLE can have the same SETID and SLOTID, (but with different SLOTENTRY values)
-each SETID and SLOTID combination always have the same WEEKID and WEEKDAY values.
-</details>
-
-When publishing CMIS schedule information to E360 a REST API must be used.
-Due to the data model structures mentioned above when a change is made to one
-row in CMIS, many REST API calls may need to be made to the E360 REST API in order to keep
-the schedules in sync.
 
 ### Handling inconsistent states in CMIS
 
@@ -320,7 +335,8 @@ To support the integration with E360 a new table will be created.
 | TIMETABLE      | SLOTID        | NUMBER        |                                                     |
 | TIMETABLE      | WEEKID_OLD    | NUMBER        |                                                     |
 | TIMETABLE      | WEEKID_NEW    | NUMBER        |                                                     |
-| TIMETABLE      | WEEKDAY       | NUMBER        |                                                     |
+| TIMETABLE      | WEEKDAY_OLD   | NUMBER        |                                                     |
+| TIMETABLE      | WEEKDAY_NEW   | NUMBER        |                                                     |
 | TIMETABLE      | STARTTIME     | VARCHAR2(5)   |                                                     |
 | TIMETABLE      | FINISHTIME    | VARCHAR2(5)   |                                                     |
 | TIMETABLE      | MODULEID      | VARCHAR2(20)  |                                                     |

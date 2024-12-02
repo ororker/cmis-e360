@@ -4,39 +4,26 @@
     <bpmn:sequenceFlow id="Flow_0vvhn80" name="${!old_valid}" sourceRef="Gateway_1x9k7xf" targetRef="Event_1fez56e">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=${!old_valid}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_0g2ddvl" name="${old_valid}" sourceRef="Gateway_1x9k7xf" targetRef="Activity_19x6301" />
+    <bpmn:sequenceFlow id="Flow_0g2ddvl" name="${old_valid}" sourceRef="Gateway_1x9k7xf" targetRef="Activity_0zabiuh" />
     <bpmn:startEvent id="Event_0wx5z3a" name="Delete TIMETABLE row trigger">
       <bpmn:outgoing>Flow_1t3fjcy</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:endEvent id="Event_1fez56e">
       <bpmn:incoming>Flow_0vvhn80</bpmn:incoming>
-      <bpmn:incoming>Flow_0ps9z2b</bpmn:incoming>
+      <bpmn:incoming>Flow_18fl45m</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_0ps9z2b" sourceRef="Activity_19x6301" targetRef="Event_1fez56e" />
     <bpmn:sequenceFlow id="Flow_11gvpnq" sourceRef="Activity_196w7ct" targetRef="Gateway_1x9k7xf" />
+    <bpmn:sequenceFlow id="Flow_18fl45m" sourceRef="Activity_0zabiuh" targetRef="Event_1fez56e" />
     <bpmn:sequenceFlow id="Flow_1t3fjcy" sourceRef="Event_0wx5z3a" targetRef="Activity_196w7ct" />
-    <bpmn:subProcess id="Activity_19x6301" name="For each week associated with weekid">
-      <bpmn:incoming>Flow_0g2ddvl</bpmn:incoming>
-      <bpmn:outgoing>Flow_0ps9z2b</bpmn:outgoing>
-      <bpmn:multiInstanceLoopCharacteristics isSequential="true" />
-      <bpmn:startEvent id="Event_1i5ugrv">
-        <bpmn:outgoing>Flow_15oyqqd</bpmn:outgoing>
-      </bpmn:startEvent>
-      <bpmn:endEvent id="Event_1vlrl0b">
-        <bpmn:incoming>Flow_1nerhh6</bpmn:incoming>
-      </bpmn:endEvent>
-      <bpmn:sequenceFlow id="Flow_15oyqqd" sourceRef="Event_1i5ugrv" targetRef="Activity_1qousv1" />
-      <bpmn:sequenceFlow id="Flow_1nerhh6" sourceRef="Activity_1qousv1" targetRef="Event_1vlrl0b" />
-      <bpmn:task id="Activity_1qousv1" name="Schedule Del notification to E360">
-        <bpmn:incoming>Flow_15oyqqd</bpmn:incoming>
-        <bpmn:outgoing>Flow_1nerhh6</bpmn:outgoing>
-      </bpmn:task>
-    </bpmn:subProcess>
     <bpmn:exclusiveGateway id="Gateway_1x9k7xf">
       <bpmn:incoming>Flow_11gvpnq</bpmn:incoming>
       <bpmn:outgoing>Flow_0vvhn80</bpmn:outgoing>
       <bpmn:outgoing>Flow_0g2ddvl</bpmn:outgoing>
     </bpmn:exclusiveGateway>
+    <bpmn:task id="Activity_0zabiuh" name="Insert row into table STT_ECHO _QUEUE">
+      <bpmn:incoming>Flow_0g2ddvl</bpmn:incoming>
+      <bpmn:outgoing>Flow_18fl45m</bpmn:outgoing>
+    </bpmn:task>
     <bpmn:task id="Activity_196w7ct" name="Validate if row can be sent to E360">
       <bpmn:incoming>Flow_1t3fjcy</bpmn:incoming>
       <bpmn:outgoing>Flow_11gvpnq</bpmn:outgoing>
@@ -57,45 +44,27 @@
       <bpmndi:BPMNShape id="BPMNShape_0z10ocz" bpmnElement="Gateway_1x9k7xf" isMarkerVisible="true">
         <dc:Bounds x="355" y="165" width="50" height="50" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0zabiuh_di" bpmnElement="Activity_0zabiuh">
+        <dc:Bounds x="490" y="150" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_0k5a9hr" bpmnElement="Event_1fez56e">
-        <dc:Bounds x="889" y="172" width="36" height="36" />
+        <dc:Bounds x="629" y="172" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_136tng3_di" bpmnElement="Activity_19x6301" isExpanded="true">
-        <dc:Bounds x="480" y="115" width="350" height="150" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1i5ugrv_di" bpmnElement="Event_1i5ugrv">
-        <dc:Bounds x="512" y="172" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1qousv1_di" bpmnElement="Activity_1qousv1">
-        <dc:Bounds x="600" y="150" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1vlrl0b_di" bpmnElement="Event_1vlrl0b">
-        <dc:Bounds x="752" y="172" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_15oyqqd_di" bpmnElement="Flow_15oyqqd">
-        <di:waypoint x="548" y="190" />
-        <di:waypoint x="600" y="190" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1nerhh6_di" bpmnElement="Flow_1nerhh6">
-        <di:waypoint x="700" y="190" />
-        <di:waypoint x="752" y="190" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0g2ddvl_di" bpmnElement="Flow_0g2ddvl">
         <di:waypoint x="405" y="190" />
-        <di:waypoint x="480" y="190" />
+        <di:waypoint x="490" y="190" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="407" y="172" width="58" height="14" />
+          <dc:Bounds x="412" y="172" width="58" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_0c2advx" bpmnElement="Flow_0vvhn80">
         <di:waypoint x="380" y="165" />
         <di:waypoint x="380" y="80" />
-        <di:waypoint x="907" y="80" />
-        <di:waypoint x="907" y="172" />
+        <di:waypoint x="647" y="80" />
+        <di:waypoint x="647" y="172" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="633" y="62" width="61" height="14" />
+          <dc:Bounds x="493" y="62" width="61" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_1v3mu4n" bpmnElement="Flow_11gvpnq">
@@ -106,9 +75,9 @@
         <di:waypoint x="188" y="190" />
         <di:waypoint x="220" y="190" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0ps9z2b_di" bpmnElement="Flow_0ps9z2b">
-        <di:waypoint x="830" y="190" />
-        <di:waypoint x="889" y="190" />
+      <bpmndi:BPMNEdge id="Flow_18fl45m_di" bpmnElement="Flow_18fl45m">
+        <di:waypoint x="590" y="190" />
+        <di:waypoint x="629" y="190" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

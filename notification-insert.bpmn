@@ -71,11 +71,11 @@
         <bpmn:outgoing>Flow_13q1rvs</bpmn:outgoing>
       </bpmn:task>
     </bpmn:subProcess>
-    <bpmn:task id="Activity_1od9b7l" name="for each week store notification in STT_ECHO_ NOTIFICATION">
+    <bpmn:task id="Activity_1od9b7l" name="for each week store INSERT notification in STT_ECHO_ NOTIFICATION">
       <bpmn:incoming>Flow_11zkj2h</bpmn:incoming>
       <bpmn:outgoing>Flow_1u6u4c6</bpmn:outgoing>
     </bpmn:task>
-    <bpmn:intermediateThrowEvent id="Event_0zofc8h" name="Read oldest unprocessed row from STT_ECHO _QUEUE">
+    <bpmn:intermediateThrowEvent id="Event_0zofc8h" name="Read oldest unprocessed INSERT row from STT_ECHO _QUEUE">
       <bpmn:outgoing>Flow_1362z4s</bpmn:outgoing>
     </bpmn:intermediateThrowEvent>
     <bpmn:task id="Activity_16p2cxt" name="Reads weeks associated with weekid">
@@ -88,7 +88,7 @@
       <bpmndi:BPMNShape id="Event_0zofc8h_di" bpmnElement="Event_0zofc8h">
         <dc:Bounds x="172" y="202" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="159" y="245" width="63" height="66" />
+          <dc:Bounds x="149" y="245" width="84" height="66" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_16p2cxt_di" bpmnElement="Activity_16p2cxt">
