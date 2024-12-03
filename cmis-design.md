@@ -101,7 +101,7 @@ In this situation E360 will respond with the error message `Venue / Time slot is
 The java process will then attempt to refresh all the CMIS data for that room and day, to cope with the scenario
 where the blocking event has also been moved within CMIS but that update has not been sent to E360 yet.
 
-A row will be inserted into STT_ECHO_DAY_ROOM to note that a refresh was performed
+A row will be inserted into STT_ECHO_DAY_ROOM to record that a refresh was performed
 for a particular room and day. 
 If the outcome of refreshing all CMIS data to E360 is that there are no conflicts then the RESOLVED column will be
 populated with the current timestamp otherwise this column will be NULL.
@@ -168,15 +168,25 @@ If the previous version was eligible but the new version is not the the update c
 If the old and new versions are eligible and the weekid value has not changed then a row must be inserted into STT_ECHO_INTEGRATION for each week affected with an ACTION type of UPDATE, otherwise if the weekid value has changed then the old and new sets of weeks referenced by this row must be compared and a row must be inserted into the STT_ECHO_NOTIFICATION table for each of the weeks in the union of the old and new sets of weeks. 
 The ACTION type will depend upon whether the week was in the old set but not the new (DELETE), the new set but not the old (INSERT), or else UPDATE.
 
-The java process will then iterate over these rows in the STT_ECHO_NOTIFICATION table and where the ACTION type is INSERT or DELETE it will be processed as described above. Where the ACTION type is UPDATE then 
+The java process will then iterate over these rows in the STT_ECHO_NOTIFICATION table and where the ACTION type is INSERT or DELETE it will be processed as described above.
+Where the ACTION type is UPDATE then the process will send an PUT request to E360 and receive a 200 response indicating
+that the request was successfully processed. The java process will then update `STT_ECHO_NOTIFICATION`
+to reflect this.
+
+Where the update will result in a conflict within E360 then E360 will respond with the error message `Venue / Time slot is already taken`. 
+The java process will then attempt to refresh all the CMIS data for that room and day.
+
+A row will be inserted into STT_ECHO_DAY_ROOM to record that a refresh was performed
+for a particular room and day.
+If the outcome of refreshing all CMIS data to E360 is that there are no conflicts then the RESOLVED column will be
+populated with the current timestamp otherwise this column will be NULL.
+
+The status of the STT_ECHO_NOTIFICATION will be updated to reflect whether the notification was
+UPDATED, REFRESHED, IN-CONFLICT, OUT-OF-DATE or ERROR.
 
 
 
-
-
-the weeks that this Update transaction affects and compare those weeks with the set of weeks that the CMIS row previously referred to.
-
-
+===
 
 
 The details will then be read by a java process which will firstly determine what combination of 
