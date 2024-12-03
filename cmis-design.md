@@ -1,20 +1,5 @@
 # CMIS Design
 
-## Definitions
-
-Lesson
-: An event where a specified lecturer presents part of a course in a particular room at certain date and time.
-
-E360
-: The GU Echo360 server that captures and makes available video and audio recordings.
-
-SpaceTT2
-: A new component that may be implemented by GU IT department to automate the integration between CMIS and Echo360.
-
-## TODO
-1. verify that where a timetable entry with entryslot <> 1 that it will not have an impact on integration
-2. could we update every minute in the expectation that few clashes will occur and repair clashes over-night with batch?
-3. when will E360 report a clash? 
 
 ## Introduction
 
@@ -592,3 +577,18 @@ and re-trigger the sending of the schedule change.
 - Add UI page to allow administrators to retry one or more messages to be retried
 - Add UI page to allow administrators to pause the sending of messages to E360
 
+## Definitions
+
+Lesson
+: An event where a specified lecturer presents part of a course in a particular room at certain date and time.
+
+E360
+: The GU Echo360 server that captures and makes available video and audio recordings.
+
+SpaceTT2
+: A new component that may be implemented by GU IT department to automate the integration between CMIS and Echo360.
+
+## TODO
+1. verify that where a timetable entry with entryslot <> 1 that it will not have an impact on integration
+2. could we update every minute in the expectation that few clashes will occur and repair clashes over-night with batch?
+3. when will E360 report a clash? 
