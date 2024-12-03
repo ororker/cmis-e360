@@ -283,70 +283,10 @@ The most used room was 203 Lec Theatre 1, Boyd Orr (ID=2950203) that was used 76
 
 There are 198 rooms with audio/visual equipment.
 
-## Scenarios
-
-The CMIS analysis identified 9 scenarios that need to be considered when transferring data from CMIS to E360.
-These are laid out in the following sub-sections.
-In these sections we assume that previous messages were successfully sent to E360.
-It will be the SpaceTT2 Dispatcher's responsibility to ensure that messages are sent in the correct order.
-
-### New schedule - meets criteria
-
-The most straight forward scenario is when a new schedule is submitted that meets the criteria
-such that it needs to be sent to E360. This requires that a POST request be sent to E360 for each 
-week associated with the weekId.
-
-### New schedule - doesn't meet criteria
-
-When a new schedule is submitted that does not meet the criteria for it to be sent to E360 then this schedule can 
-simply be ignored.
-
-### Update schedule - previously did not meet criteria - now meets criteria
-
-When a schedule is updated that previously did not meet the criteria for it to be sent to E360
-then treat it as a [New schedule](#New schedule - meets criteria)
-
-### Update schedule - previously did not meet criteria - still does not meet criteria
-
-When a schedule is updated that previously did not meet the criteria for it to be sent to E360,
-and it still does not meet the criteria then the update can be ignored.
-
-### Update schedule - previously met criteria - still meets criteria - week id not updated
-
-When a schedule previously met the criteria and is updated such that it still meets the criteria
-and the WEEKID value has not been updated then a PUT request must be sent to E360 for each week associated
-with the weekId.
-
-### Update schedule - previously met criteria - still meets criteria - week id updated
-
-When a schedule previously met the criteria for sending to E360 and 
-is then updated, where the update includes a change to the weekid, and still satisfies the
-criteria for sending to E360 then a series is insert, update and delete messages 
-will be sent to E360.
-
-Where the new WEEKID references weeks that weren't associated with the original schedule then a POST request will be sent for each of these weeks.
-Where the new WEEKID no longer references weeks that were associated with the original schedule then a DELETE request will be sent for each of these weeks.
-Where the new WEEKID references weeks that were also associated with the original schedule then an UPDATE request will be sent for each of these weeks.
-
-### Update schedule - previously met criteria - no longer meets criteria
-
-When a schedule previously met the criteria and is updated such that it no longer meets the criteria
-then for each of the weeks associated with the weekid of the schedule before it was updated
-a DELETE request must be sent to E360. 
-
-### Cancel schedule - previously met criteria
-
-When a schedule previously met the criteria and is cancelled a DELETE request must be sent to E360.
-
-### Cancel schedule - previously did not meet criteria 
-
-When a schedule is cancelled that previously did not meet the criteria for it to be sent to E360
-then the cancellation can be ignored.
 
 ## Component Interactions
 ![Sequence Diagram](img/seq.png)
 
-## Trigger
 ## DB Table STT_ECHO_QUEUE
 To support the integration with E360 a new table will be created.
 
