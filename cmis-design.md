@@ -68,6 +68,9 @@ When a TIMETABLE entry is inserted, updated or deleted, it is only of interest t
 - a row must exist in ROOMREQUESTS with matching (SETID) and FEATUREID must have value 'AUDIOREC' or 'VIDEOREC'.
 - a row must exist in ROOMFEATURES with matching (SETID, ROOMID) and FEATUREID must have value 'AUDIOREC' or 'VIDEOREC'.
 
+Where the entry has been updated it is also only of interest to E360 if a value
+relevant to E360 has been updated. If this is not the case then the update can be ignored.
+
 <details>
 <summary>Developer Note</summary>
 The criteria above is an interpretation of the logic used the SpaceTT code `TestWorkloadExtractService#testProduceEchoExtract`.
@@ -94,26 +97,15 @@ For each week an insert will be made into the table `STT_ECHO_NOTIFICATION` with
 The process will then iterate over these weeks and attempt to update E360 to reflect the new state of CMIS.
 In the vast majority of cases, the process will send a POST request to E360 and receive a 201 response indicating 
 that the request was successfully processed. The java process will then update `STT_ECHO_NOTIFICATION`
-to reflect this.
+to reflect this by setting the STATUS to SUCCESS and updating the PROCESSED timestamp.
+This scenario and the alternatives are described in the section [Process Notification]()
 
-As discussed above it is possible for a different event to already exist in E360 in the target room at the same time.
-In this situation E360 will respond with the error message `Venue / Time slot is already taken`. 
-The java process will then attempt to refresh all the CMIS data for that room and day, to cope with the scenario
-where the blocking event has also been moved within CMIS but that update has not been sent to E360 yet.
-
-A row will be inserted into STT_ECHO_DAY_ROOM to record that a refresh was performed
-for a particular room and day. 
-If the outcome of refreshing all CMIS data to E360 is that there are no conflicts then the RESOLVED column will be
-populated with the current timestamp otherwise this column will be NULL.
-
-The status of the STT_ECHO_NOTIFICATION will be updated to reflect whether the notification was 
-UPDATED, REFRESHED, IN-CONFLICT, OUT-OF-DATE or ERROR.
-
+ 
 ### On Delete
 
 When the delete trigger on the TIMETABLE table is triggered it has access to the old version of the row, i.e. the data that is being deleted.
 It accesses whether the old version of the row met the criteria to allow it to be sent to E360.
-If it did then we can assume that E360 is not aware of the event and no further processing is required for this delete. If the data did meet the criteria then it will be inserted into the table `STT_ECHO_QUEUE`
+If it did then we can assume that E360 is not aware of the event and no further processing is required. If the data did meet the criteria then it will be inserted into the table `STT_ECHO_QUEUE`
 with an ACTION type of DELETE.
 
 ![Delete Workflow](img/delete.png)
@@ -130,26 +122,23 @@ REST API calls that need to be made to E360, the first step in this process is t
 this Delete transaction affects.
 For each week an insert will be made into the table `STT_ECHO_NOTIFICATION` with an action of DELETE.
 The process will then iterate over these weeks and attempt to update E360 to reflect the new state of CMIS.
+
 In the vast majority of cases, the process will send a DELETE request to E360 and receive a 200 response indicating
 that the request was successfully processed. The java process will then update `STT_ECHO_NOTIFICATION`
-to reflect this.
+to reflect this by setting the STATUS to SUCCESS and updating the PROCESSED timestamp.
 
 It is possible due to a direct change made by a user on E360 or a previous refresh of a Room/Day, that the event
 has already been deleted. In that case the value of `STT_ECHO_NOTIFICATION.STATUS` column will be set to WARN
 and the message received from E360 stored in the MESSAGE column.
 
-Where the room/day is already marked as being in-conflict then the java process will attempt to 
-refresh all the CMIS data for that room and day.
-If the outcome of refreshing all the room/day CMIS data to E360 is that there are no conflicts then the RESOLVED column will be populated with the current timestamp otherwise this column will be NULL.
-
-The status of the STT_ECHO_NOTIFICATION will be updated to reflect whether the notification was UPDATED, REFRESHED, IN-CONFLICT, OUT-OF-DATE or ERROR.
+This scenario and the alternatives are described in the section [Process Notification]()
 
 ### On Update
 
 When the update trigger on the TIMETABLE table is triggered it has access to the new and old versions of the row.
-It accesses whether the old and the new versions of the row met the criteria to allow it to be sent to E360.
-If both the old and the new versions do not meet the criteria then we can assume 
-is not currently aware and does not need to become aware of this event so
+It accesses whether the old and the new versions of the row meet the criteria to allow it to be sent to E360.
+If both the old and the new versions do not meet the criteria then we can assume E360
+is not currently aware of this event and does not need to become aware of it so
 no further processing is required for this update, otherwise the details of the update will be inserted into the table `STT_ECHO_QUEUE` with an action type of UPDATE.
 
 ![Update Workflow](img/update.png)
@@ -164,26 +153,60 @@ Due to the one-to-many relationship that can exist between the rows in the TIMET
 the update based on whether the previous and current versions of the row are eligible to be sent to E360.
 
 If the previous version was not eligible but the new version is then the update can be treated in much the same way as an insert, i.e. a row can be inserted into the STT_ECHO_NOTIFICATION table for each affected week with an ACTION type of INSERT.
-If the previous version was eligible but the new version is not the the update can be treated in must the same way as a delete, i.e. a row can be inserted into the STT_ECHO_NOTIFICATION table for each affected week with an ACTION type of DELETE.
-If the old and new versions are eligible and the weekid value has not changed then a row must be inserted into STT_ECHO_INTEGRATION for each week affected with an ACTION type of UPDATE, otherwise if the weekid value has changed then the old and new sets of weeks referenced by this row must be compared and a row must be inserted into the STT_ECHO_NOTIFICATION table for each of the weeks in the union of the old and new sets of weeks. 
-The ACTION type will depend upon whether the week was in the old set but not the new (DELETE), the new set but not the old (INSERT), or else UPDATE.
+If the previous version was eligible but the new version is not then the update can be treated in must the same way as a Delete, i.e. a row can be inserted into the STT_ECHO_NOTIFICATION table for each affected week (based upon the WEEKID from the `:old` record) with an ACTION type of DELETE.
+If the old and new versions are eligible and the WEEKID value has not changed then a row must be inserted into STT_ECHO_NOTIFICATION for each week affected with an ACTION type of UPDATE, otherwise if the WEEKID value has changed then the old and new sets of weeks referenced by this row must be compared and a row must be inserted into the STT_ECHO_NOTIFICATION table for each of the weeks in the union of the old and new sets of weeks. 
+The ACTION type will depend upon whether the week was in the old set but not the new (DELETE), the new set but not the old (INSERT), or else it will be UPDATE.
 
-The java process will then iterate over these rows in the STT_ECHO_NOTIFICATION table and where the ACTION type is INSERT or DELETE it will be processed as described above.
+The java process will then iterate over these rows in the STT_ECHO_NOTIFICATION table and where the ACTION type is INSERT or DELETE it will be processed as described in the sections above.
 Where the ACTION type is UPDATE then the process will send an PUT request to E360 and receive a 200 response indicating
 that the request was successfully processed. The java process will then update `STT_ECHO_NOTIFICATION`
 to reflect this.
 
-Where the update will result in a conflict within E360 then E360 will respond with the error message `Venue / Time slot is already taken`. 
-The java process will then attempt to refresh all the CMIS data for that room and day.
+This scenario and the alternatives are described in the section [Process Notification]()
 
-A row will be inserted into STT_ECHO_DAY_ROOM to record that a refresh was performed
-for a particular room and day.
-If the outcome of refreshing all CMIS data to E360 is that there are no conflicts then the RESOLVED column will be
-populated with the current timestamp otherwise this column will be NULL.
 
-The status of the STT_ECHO_NOTIFICATION will be updated to reflect whether the notification was
-UPDATED, REFRESHED, IN-CONFLICT, OUT-OF-DATE or ERROR.
+### Process Notification
 
+When a row from STT_ECHO_NOTIFICATION is processed by the Java process, in the majority of cases an HTTP request object will be instantiated with an HTTP Method of POST/PUT/DELETE corresponding to the the type of the insert/update/delete notification and posted to E360.
+The response will generally be successful and the STT_ECHO_NOTIFICATION table columns PROCESSED will be updated with the current timestamp and STATUS will be updated with SUCCESS.
+
+There are some error scenarios that also need to be accommodated as shown in the diagram below.
+
+![Process Notification](img/process_notification.png)
+
+As discussed above it is possible for a different event to already exist in E360 in the target room at the same time.
+In this situation E360 will respond with the error message `Venue / Time slot is already taken`.
+The java process will then attempt to refresh all the CMIS data for that room and day
+as described in [Refresh Room & Day Data](#Refresh Room & Day Data).
+
+If after the refresh has been completed the Room/Day data is still in conflict then the STT_ECHO_NOTIFICATION STATUS will be updated to IN-CONFLICT, otherwise it will be set to
+REFRESHED.
+
+If some unexpected error response is received from E360 then the STT_ECHO_NOTIFICATION STATUS will be updated to ERROR and the message returned from E360 will be stored in the MESSAGE column. The time when the notification was processed will also be recorded in the PROCESSED column.
+
+During the Refresh Room & Day Data process a record will be written to the table STT_ECHO_DAY_ROOM.
+
+When a notification is processed a check will be made to ensure that the notification record was not created after the last time that a refresh was performed on the target Room and Day. If it was then this notification can be ignored and its STT_ECHO_NOTIFICATION STATUS will be updated to OUT_OF_DATE. The time when the notification was processed will also be recorded in the PROCESSED column.
+
+### Refresh Room & Day Data 
+
+When the Java process attempts to schedule an event in E360 that overlaps with a different event's schedule then E360 will respond with the error `Venue / Time slot is already taken`.
+We will then consider this Room & Day as being in-conflict and a row will be written to the table STT_ROOM_DAY.
+
+The java process will then attempt to reconcile the schedule within CMIS and E360 by:
+1. fetching the events from E360 for that room on that day.
+2. selecting from the CMIS TIMETABLE table the E360 relevant events on that day, excluding those events that are in conflict within the table.
+3. calculating what requests will be required to make the schedule in E360 mirror that calculated in 2.
+4. send those requests to E360.
+5. if no api errors occurred and no events were excluded then update the row in STT_ECHO_NOTIFICATION with the status REFRESHED and insert a row into STT_ROOM_DATA with the RESOLVED column containing the current timestamp.
+6. if no api errors occurred but events had to be excluded in 2. update the row in STT_ECHO_NOTIFICATION with the status IN_CONFLICT and insert a row into STT_ROOM_DATA with the RESOLVED column NULL.
+7. if api errors occurred while sending the requests, record the errors in STT_ECHO_NOTIFICATION and insert a row into STT_ROOM_DATA with the RESOLVED column NULL.
+
+This process is shown in the diagram below.
+
+![Refresh Room & Day data](img/refresh-room-day.png)
+
+Where an update notification resulted in the conflict and the update involved a change in the room, then both the old and new rooms should be considered in conflict and therefore the refresh process will need to be run for each room.
 
 
 ===
