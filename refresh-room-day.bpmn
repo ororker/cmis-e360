@@ -13,10 +13,17 @@
       <bpmn:incoming>Flow_1vwrwqy</bpmn:incoming>
       <bpmn:outgoing>Flow_09a9vvn</bpmn:outgoing>
       <bpmn:multiInstanceLoopCharacteristics isSequential="true" />
+      <bpmn:sequenceFlow id="Flow_0fisilm" name="${!hasConflicts}" sourceRef="Gateway_0sy9ifb" targetRef="Activity_1uefbch" />
+      <bpmn:sequenceFlow id="Flow_059v1xj" name="${hasConflicts}" sourceRef="Gateway_0sy9ifb" targetRef="Activity_1h73jir" />
       <bpmn:task id="Activity_1s4az3n" name="Calc requests required to align E360 to CMIS without conflicts">
         <bpmn:incoming>Flow_0wwy50n</bpmn:incoming>
         <bpmn:outgoing>Flow_1lqnabx</bpmn:outgoing>
       </bpmn:task>
+      <bpmn:exclusiveGateway id="Gateway_0sy9ifb" name="CMIS room/day data has conflicts">
+        <bpmn:incoming>Flow_07c0v3z</bpmn:incoming>
+        <bpmn:outgoing>Flow_059v1xj</bpmn:outgoing>
+        <bpmn:outgoing>Flow_0fisilm</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
       <bpmn:startEvent id="Event_0cm3cez">
         <bpmn:outgoing>Flow_132fgxo</bpmn:outgoing>
       </bpmn:startEvent>
@@ -39,18 +46,11 @@
       <bpmn:sequenceFlow id="Flow_146ombt" sourceRef="Activity_1h73jir" targetRef="Event_1j7k9s3" />
       <bpmn:sequenceFlow id="Flow_160zv6j" sourceRef="Activity_0qeu1uk" targetRef="Activity_017sh1i" />
       <bpmn:sequenceFlow id="Flow_1lqnabx" sourceRef="Activity_1s4az3n" targetRef="Activity_01630p6" />
-      <bpmn:exclusiveGateway id="Gateway_0sy9ifb" name="CMIS room/day data has conflicts">
-        <bpmn:incoming>Flow_07c0v3z</bpmn:incoming>
-        <bpmn:outgoing>Flow_059v1xj</bpmn:outgoing>
-        <bpmn:outgoing>Flow_0fisilm</bpmn:outgoing>
-      </bpmn:exclusiveGateway>
-      <bpmn:sequenceFlow id="Flow_059v1xj" name="${hasConflicts}" sourceRef="Gateway_0sy9ifb" targetRef="Activity_1h73jir" />
-      <bpmn:task id="Activity_1h73jir" name="Insert/Update Room/Day In Conflict row">
+      <bpmn:task id="Activity_1h73jir" name="Insert/Update STT_ECHO_DAY_ROOM with  status in-conflict">
         <bpmn:incoming>Flow_059v1xj</bpmn:incoming>
         <bpmn:outgoing>Flow_146ombt</bpmn:outgoing>
       </bpmn:task>
-      <bpmn:sequenceFlow id="Flow_0fisilm" name="${!hasConflicts}" sourceRef="Gateway_0sy9ifb" targetRef="Activity_1uefbch" />
-      <bpmn:task id="Activity_1uefbch" name="Remove Room/Day In Conflict mark">
+      <bpmn:task id="Activity_1uefbch" name="Insert/Update STT_ECHO_DAY_ROOM with  status resolved">
         <bpmn:incoming>Flow_0fisilm</bpmn:incoming>
         <bpmn:outgoing>Flow_0o6w60m</bpmn:outgoing>
       </bpmn:task>

@@ -49,9 +49,9 @@ The impact of this is that one change within CMIS can result in multiple changes
 ## Integration Workflow
 The integration from CMIS to E360 will be event driven.
 The events will be initiated by insert, update and delete triggers that will be applied to CMIS's TIMETABLE table.
-These triggers will result in a row being written to the table STT_ECHO_QUEUE when the data supplied to the trigger meets certain criteria as defined in [Criteria for sending schedule information to E360](#Criteria for sending schedule information to E360).
-The work performed in the triggers will be kept to a minimum so as not to impact the
-performance of CMIS generally.
+When the triggers are passed data that matches the [criteria for sending schedule information to E360](#Criteria for sending schedule information to E360) then a row will be written to the table STT_ECHO_QUEUE.
+The work performed in the triggers will be kept to a minimum so as not to impact the overall
+performance of CMIS.
 
 A Springframework CRON process running in a new component SpaceTT2, will then read and process each of these rows in the order that they were written.
 
@@ -74,26 +74,110 @@ The criteria above is an interpretation of the logic used the SpaceTT code `Test
 </details>
 
 ### On Insert
-When the insert trigger on the TIMETABLE table is triggered the first thing it will do is assess whether the row meets the criteria described above to allow it to be sent to E360.
-If it does not meet the criteria then no further processing on it will take place within this trigger.
-
-If it is valid then for each week associated with the CMIS row a sub-process will be initiated to propagate the insert for that week.
-Each update sent to E360 relies upon E360 being aware of the associated reference data, e.g. the course, room and lecturer data, and if E360 is not aware of this data then the request will fail. The failure message will indicate which piece of reference data is missing and the process will update E360 with this reference data before re-sending the initial request.
-
-In the event that E360 already has a lesson scheduled for a particular room and date/time, E360 will respond with the error `Venue / Time slot is already taken`. 
-An attempt will now be made to refresh all scheduled events on this particular day in the room that has the clash.
-If a conflict still exists then a row will then be inserted into the STT_ECHO_DAY_ROOM_CONFLICT table.
-When subsequent notifications are received for this room/day then a further full Room/Day refresh will take place, until the scheduling conflict is resolved.
+When the insert trigger on the TIMETABLE table is triggered the first thing it will do is assess whether the new row meets the criteria described above to allow it to be sent to E360.
+If it does not meet the criteria then no further processing will be performed.
+If it does meet the criteria then a row will be written to the table `STT_ECHO_QUEUE` with an ACTION type of INSERT.
 
 ![Insert Workflow](img/insert.png)
 
+### Processing Inserts from STT_ECHO_QUEUE
+
+Every minute a SpringFrameWork CRON job will initiate a java process to process new rows from STT_ECHO_QUEUE.
+Where the new row has an ACTION type of INSERT the processing will be as shown below.
+
 ![Insert Notification Workflow](img/notification-insert.png)
+
+Due to the one-to-many relationship that can exist between the rows in the TIMETABLE table in CMIS and the 
+REST API calls that need to be made to E360, the first step in this process is to identify the weeks that
+this Insert transaction affects.
+For each week an insert will be made into the table `STT_ECHO_NOTIFICATION` with an action of INSERT.
+The process will then iterate over these weeks and attempt to update E360 to reflect the new state of CMIS.
+In the vast majority of cases, the process will send a POST request to E360 and receive a 201 response indicating 
+that the request was successfully processed. The java process will then update `STT_ECHO_NOTIFICATION`
+to reflect this.
+
+As discussed above it is possible for a different event to already exist in E360 in the target room at the same time.
+In this situation E360 will respond with the error message `Venue / Time slot is already taken`. 
+The java process will then attempt to refresh all the CMIS data for that room and day, to cope with the scenario
+where the blocking event has also been moved within CMIS but that update has not been sent to E360 yet.
+
+A row will be inserted into STT_ECHO_DAY_ROOM to note that a refresh was performed
+for a particular room and day. 
+If the outcome of refreshing all CMIS data to E360 is that there are no conflicts then the RESOLVED column will be
+populated with the current timestamp otherwise this column will be NULL.
+
+The status of the STT_ECHO_NOTIFICATION will be updated to reflect whether the notification was 
+UPDATED, REFRESHED, IN-CONFLICT, OUT-OF-DATE or ERROR.
+
+### On Delete
+
+When the delete trigger on the TIMETABLE table is triggered it has access to the old version of the row, i.e. the data that is being deleted.
+It accesses whether the old version of the row met the criteria to allow it to be sent to E360.
+If it did then we can assume that E360 is not aware of the event and no further processing is required for this delete. If the data did meet the criteria then it will be inserted into the table `STT_ECHO_QUEUE`
+with an ACTION type of DELETE.
+
+![Delete Workflow](img/delete.png)
+
+### Processing Deletes from STT_ECHO_QUEUE
+
+Every minute a SpringFrameWork CRON job will initiate a java process to process new rows from STT_ECHO_QUEUE.
+Where the new row has an ACTION type of DELETE the processing will be as shown below.
+
+![Delete Notification Workflow](img/notification-delete.png)
+
+Due to the one-to-many relationship that can exist between the rows in the TIMETABLE table in CMIS and the
+REST API calls that need to be made to E360, the first step in this process is to identify the weeks that
+this Delete transaction affects.
+For each week an insert will be made into the table `STT_ECHO_NOTIFICATION` with an action of DELETE.
+The process will then iterate over these weeks and attempt to update E360 to reflect the new state of CMIS.
+In the vast majority of cases, the process will send a DELETE request to E360 and receive a 200 response indicating
+that the request was successfully processed. The java process will then update `STT_ECHO_NOTIFICATION`
+to reflect this.
+
+It is possible due to a direct change made by a user on E360 or a previous refresh of a Room/Day, that the event
+has already been deleted. In that case the value of `STT_ECHO_NOTIFICATION.STATUS` column will be set to WARN
+and the message received from E360 stored in the MESSAGE column.
+
+Where the room/day is already marked as being in-conflict then the java process will attempt to 
+refresh all the CMIS data for that room and day.
+If the outcome of refreshing all the room/day CMIS data to E360 is that there are no conflicts then the RESOLVED column will be populated with the current timestamp otherwise this column will be NULL.
+
+The status of the STT_ECHO_NOTIFICATION will be updated to reflect whether the notification was UPDATED, REFRESHED, IN-CONFLICT, OUT-OF-DATE or ERROR.
 
 ### On Update
 
 When the update trigger on the TIMETABLE table is triggered it has access to the new and old versions of the row.
-It accesses whether or not the old and or the new versions of the row meet the criteria to allow it to be sent to E360.
-If both the old and the new versions do not meet the criteria then no further processing on it will take place within this trigger, otherwise the details of the update will be inserted into the table `STT_ECHO_QUEUE`.
+It accesses whether the old and the new versions of the row met the criteria to allow it to be sent to E360.
+If both the old and the new versions do not meet the criteria then we can assume 
+is not currently aware and does not need to become aware of this event so
+no further processing is required for this update, otherwise the details of the update will be inserted into the table `STT_ECHO_QUEUE` with an action type of UPDATE.
+
+![Update Workflow](img/update.png)
+
+### Processing Updates from STT_ECHO_QUEUE
+
+Every minute a SpringFrameWork CRON job will initiate a java process to process new rows from STT_ECHO_QUEUE. Where the new row has an ACTION type of UPDATE the processing will be as shown below.
+
+![Update Notification Workflow](img/notification-update.png)
+
+Due to the one-to-many relationship that can exist between the rows in the TIMETABLE table in CMIS and the REST API calls that need to be made to E360, the first step in this process is to identify how to process 
+the update based on whether the previous and current versions of the row are eligible to be sent to E360.
+
+If the previous version was not eligible but the new version is then the update can be treated in much the same way as an insert, i.e. a row can be inserted into the STT_ECHO_NOTIFICATION table for each affected week with an ACTION type of INSERT.
+If the previous version was eligible but the new version is not the the update can be treated in must the same way as a delete, i.e. a row can be inserted into the STT_ECHO_NOTIFICATION table for each affected week with an ACTION type of DELETE.
+If the old and new versions are eligible and the weekid value has not changed then a row must be inserted into STT_ECHO_INTEGRATION for each week affected with an ACTION type of UPDATE, otherwise if the weekid value has changed then the old and new sets of weeks referenced by this row must be compared and a row must be inserted into the STT_ECHO_NOTIFICATION table for each of the weeks in the union of the old and new sets of weeks. 
+The ACTION type will depend upon whether the week was in the old set but not the new (DELETE), the new set but not the old (INSERT), or else UPDATE.
+
+The java process will then iterate over these rows in the STT_ECHO_NOTIFICATION table and where the ACTION type is INSERT or DELETE it will be processed as described above. Where the ACTION type is UPDATE then 
+
+
+
+
+
+the weeks that this Update transaction affects and compare those weeks with the set of weeks that the CMIS row previously referred to.
+
+
+
 
 The details will then be read by a java process which will firstly determine what combination of 
 insert, update and delete notifications need to be sent to E360 to synchronize it with the data in CMIS.
@@ -114,27 +198,15 @@ When Administrators deem that the underlying issue for a notification
 failure has been resolved then they will be able to trigger
 a refresh of the Room/Day data to E360.
 
-![Update Workflow](img/update.png)
-
-![Update Notification Workflow](img/notification-update.png)
 
 
-### On Delete
 
-When the delete trigger on the TIMETABLE table is triggered it has access to the old version of the row, i.e. the data that is being deleted.
-It accesses whether the old version of the row meet the criteria to allow it to be sent to E360.
-If it did not then no further processing will take place within this trigger, otherwise the details of the delete will be inserted into the table `STT_ECHO_QUEUE`.
+Each update sent to E360 relies upon E360 being aware of the associated reference data, e.g. the course, room and lecturer data, and if E360 is not aware of this data then the request will fail. The failure message will indicate which piece of reference data is missing and the process will update E360 with this reference data before re-sending the initial request.
 
-Similar to how On Insert notifications were handled, the majority of notifications will be handled by sending
-a REST API call to E360, in this case with an HTTP method of DELETE.
-
-Where the Room/Day is already in conflict then as long as the notification wasn't received prior to the
-last time that the room/day was refreshed then the room day will be refreshed.
-
-![Delete Workflow](img/delete.png)
-
-![Delete Notification Workflow](img/notification-delete.png)
-
+In the event that E360 already has a lesson scheduled for a particular room and date/time, E360 will respond with the error `Venue / Time slot is already taken`.
+An attempt will now be made to refresh all scheduled events on this particular day in the room that has the clash.
+If a conflict still exists then a row will then be inserted into the STT_ECHO_DAY_ROOM table.
+When subsequent notifications are received for this room/day then a further full Room/Day refresh will take place, until the scheduling conflict is resolved.
 
 ### Handling inconsistent states in CMIS
 
@@ -305,7 +377,7 @@ To support the integration with E360 a new table will be created.
 NB We don't need the slot entry because it is always 1.
 
 
-## DB Table STT_ECHO_DAY_ROOM_CONFLICT
+## DB Table STT_ECHO_DAY_ROOM
 To support the integration with E360 a new table will be created.
 
 | SOURCE         | NAME        | TYPE          | DESC                                                |
@@ -329,7 +401,7 @@ To support the integration with E360 a new table will be created.
 |                | CREATED       | DATE          | Date/timestamp when row was inserted                |
 |                | PROCESSED     | DATE          | Date/timestamp when row was processed               |
 |                | STATUS        | VARCHAR(1)    | [UNPROCESSED \| IN_PROGRESS \| PROCESSED \| FAILED] |
-|                | ERROR         | VARCHAR2(100) | A description of the error                          |
+|                | MESSAGE       | VARCHAR2(100) | A description of the error/warning                  |
 | TIMETABLE      | ACTION        | VARCHAR(1)    | The type of request to be sent to E360: [I\|U\|D]   |
 | TIMETABLE      | SETID         | VARCHAR2(10)  |                                                     |
 | TIMETABLE      | SLOTID        | NUMBER        |                                                     |
