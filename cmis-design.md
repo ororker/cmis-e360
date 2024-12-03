@@ -346,39 +346,7 @@ then the cancellation can be ignored.
 ## Component Interactions
 ![Sequence Diagram](img/seq.png)
 
-## Triggers
-### DB Insert Trigger
-A new DB Insert trigger (after each row) will be created on the TIMETABLE table.
-This trigger will verify the criteria in
-[Criteria for sending schedule information to E360](#Criteria for sending schedule information to E360)
-has been met and if so then a new row will be inserted into
-[DB Table STT_ECHO_QUEUE](#DB Table STT_ECHO_QUEUE).
-
-### DB Update Trigger
-A new DB Update trigger (before each row) will be created on the TIMETABLE table.
-This trigger will identify which of the scenarios
-specified above this update matches and depending on that scenario may 
-insert the appropriate values into STT_ECHO_QUEUE.
-
-### DB Delete Trigger
-A new DB Delete trigger (before each row) will be created on the TIMETABLE table.
-This trigger will insert a new row in STT_ECHO_QUEUE with an action DELETE
-if the row that is being deleted or cancelled (status = 3) 
-meets the [Previous met criteria](#Previous met criteria) test.
-
-### Previoiusly met criteria
-
-The Update and Delete triggers above need to determine whether
-the schedule's previous version met the criteria whereby the data needed to be sent 
-to E360.
-
-The test that will be used to determine if the previous version of this schedule
-did meet the criteria requiring it to be sent to E360 is:
-- there must exist a row in STT_ECHO_QUEUE matching the schedule's (setid, slotid) that was successfully sent
-- the most recent of these rows must have an action of INSERT or UPDATE (not DELETE). 
-
-
-
+## Trigger
 ## DB Table STT_ECHO_QUEUE
 To support the integration with E360 a new table will be created.
 
