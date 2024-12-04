@@ -595,7 +595,7 @@ and re-trigger the sending of the schedule change.
 
 ### No of rooms E360 is used in (23/24): 198
 
-The following sql was used to identify all of the rooms with audio/visual equipment used for lectures in 2023/4
+The following sql was used to identify all the rooms with audio/visual equipment used for lectures in 2023/4:
 
 <details>
 <summary>SQL</summary>
