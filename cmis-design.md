@@ -429,25 +429,23 @@ This table holds the details of the notification that will be sent to E360.
 
 NB We don't need the slot entry because it is always 1.
 
-## Spring CRON job
+## SpringFrameWork CRON job
 
-A new application will be created called SpaceTT2.
+A new application will be created called SpaceTT2 to orchestrate the updates from CMIS to E360.
 This application will run on Java21 which is the latest LTS Java version.
-This application will be configured to run Spring CRON jobs.
-The library that will be used to provide the CRON functionality will be
-the [Quartz Scheduler](https://docs.spring.io/spring-boot/reference/io/quartz.html).
+The application will be configured to run SpringFrameWork CRON jobs using the [Quartz Scheduler](https://docs.spring.io/spring-boot/reference/io/quartz.html) library.
 This library can be easily configured to ensure that CRON jobs only run on one server at a time
 should WildFly ever be configured to use multiple servers.
 
-The CRON job will initiate a call to the E360Servce component that will
-process messages waiting to be processed on the STT_E360_QUEUE.
+The CRON job will initiate a call to the E360Servce component that will process messages waiting in the STT_E360_QUEUE table.
 
-## E360Service
+## E360 API calls
 
-The E360Service will read all unprocessed messages from the STT_E360_QUEUE table.
-For each row a request will be created and posted to the E360 REST service.
+The E360Service will implement the design outlined in the section [Integration Workflow](#Integration Workflow) above and when necessary make API calls to the E360 REST service.
 
-All of the data that needs to be sent to E360 in the Schedule message is contained in the STT_E360_QUEUE table.
+All of the data that needs to be sent to E360 in the Schedule message will be available from the table STT_ECHO_NOTIFICATION table.
+
+TODO external reference id definition
 
 Examples of each of the request types are shown below.
 
@@ -562,10 +560,8 @@ The response to an update request is structurally the same as for an insert requ
 
 An example of a request that can be sent to delete an event is shown below:
 
-```json
-delete /public/api/v2/schedules/{
-  schedule
-}
+```http request
+delete /public/api/v2/schedules/{schedule}
 ```
 
 where {schedule} can be an external id or an E360 id. We shall use the external id.
