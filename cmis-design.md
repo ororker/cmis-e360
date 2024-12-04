@@ -155,21 +155,20 @@ This scenario and the alternatives are described in the section [Process Notific
 When a row from STT_ECHO_NOTIFICATION is processed by the Java function, in the majority of cases an HTTP request object will be instantiated with an HTTP Method of POST/PUT/DELETE corresponding to the type of the insert/update/delete notification and posted to E360.
 The response will generally be successful and the STT_ECHO_NOTIFICATION table columns PROCESSED will be updated with the current timestamp and STATUS will be updated with SUCCESS.
 
-There are some error scenarios that also need to be accommodated as shown in the diagram below.
-
-![Process Notification](img/process_notification.png)
-
 As discussed above it is possible for a different event to already exist in E360 in the target room at the same time.
 In this situation E360 will respond with the error message `Venue / Time slot is already taken`.
 The java process will then attempt to refresh all the CMIS data for that room and day
 as described in [Refresh Room & Day Data](#Refresh Room & Day Data).
-During the Refresh Room & Day Data process a record will be written to the table STT_ECHO_DAY_ROOM.
 
-If after the refresh has been completed the Room/Day data is still in conflict then the `STT_ECHO_NOTIFICATION` `STATUS` column will be updated to IN-CONFLICT, otherwise it will be set to REFRESHED.
+The first stage of processing a notification is to establish that the notification is not out of date.
+It will be out of date if the last attempt to refresh the Room & Day data happened after the created timestamp on the notification. In this situation the notification's status will be updated to OUT_OF_DATE and no API calls will be made to E360. 
 
-If an unexpected error response is received from E360 then the STT_ECHO_NOTIFICATION STATUS will be updated to ERROR and the message returned from E360 will be stored in the MESSAGE column. The time when the notification was processed will also be recorded in the PROCESSED column.
+The process notification flow is shown in the diagram below.
 
-When a notification is processed a check will be made to ensure that the notification record was not created after the last time that a refresh was performed on the target Room and Day. If it was then this notification can be ignored and its STT_ECHO_NOTIFICATION STATUS will be set to OUT_OF_DATE. The time when the notification was processed will also be recorded in the PROCESSED column.
+![Process Notification](img/process_notification.png)
+
+Other error scenarios are described in the section [Error Handling](#Error Handling).
+
 
 ### Refresh Room & Day Data 
 
@@ -191,29 +190,91 @@ This process is shown in the diagram below.
 
 Where an update notification resulted in the conflict and the update involved a change in the room, then both the old and new rooms should be considered in conflict and therefore the refresh process will need to be run for each room.
 
+Step 2 mentions that `relevant` events on that day will be retrieved from the CMIS TIMETABLE table.
+Relevant can be interpreted differently depending upon the strategy for handling conflicts.
+The 3 different strategies are:
+1. Ignore events in conflict. This strategy requires that if events overlap then ignore them and only consider non-conflicting events as eligible for sending to E360.
+2. First event wins. This strategy requires that where events overlap the event with the least recent update date would be considered as eligible for sending to E360.
+3. Last event wins. This strategy requires that where events overlap the event with the most recent update date would be considered as eligible for sending to E360.
+
+Strategies 2 and 3 may be more complex to implement because we could have a situation there is a chain of overlapping events e.g.
+
+| id | room | start | end  |
+|----|------|-------|------|
+| 1  | 1    | 0900  | 1000 |
+| 2  | 1    | 0930  | 1030 |
+| 3  | 1    | 1000  | 1100 |
+
+## Error Handling
+
+When an error is received while processing a row within STT_ECHO_QUEUE
+then an attempt will be made to recover, e.g. to fix missing reference data,
+however if that is not possible then the STT_ECHO_QUEUE.STATUS value for that row will be set to `FAILED`
+and a description of the error added to the STT_ECHO_QUEUE.ERROR column.
+
+A UI will be created to allow administrators to view the messages that have failed
+and allow them to retry 1 or more messages.
+When the user submits a retry request via the UI then a new row(s) will be inserted into
+STT_ECHO_QUEUE and these will be processed when a subsequent CRON job runs.
+
+### Missing reference data
+
+The reference data contained within E360 will be largely complete however we cannot rely upon all
+the rooms, lecturers and sections (course + sub-group) and their parent entities being known to E360.
+
+![Class Diagram](img/class.png)
+
+When a request to insert or update the schedule data in E360 fails because an entity
+the schedule depends on is missing then SpaceTT2 will identify the type of
+entity that is missing from the error response, insert the missing entity and any missing parent entities,
+and then attempt to insert or update the schedule data again.
+
+The approach may result in repeated attempts to insert or update the same schedule, for example,
+when the room, lecturer and course information are all missing from E360.
+
+#### Identifying missing reference data type
+
+When E360 is unable to identify a particular entity specified in a schedule request then it will
+return an error code of `400` and a JSON response document containing `RoomNotFound`, `UserNotFound` or
+`ScheduleNotFound` respectively. An example response document for the room not found scenario
+would be:
+```json
+{
+  "error": "RoomNotFound",
+  "message": "Room not found"
+}
+```
+
+The parents of the Room and Section entities are shown in the diagram above.
+
+NB Users/Lecturers cannot be created via the REST API and therefore will require manual intervention.
+
+### External Id not unique
+If an insert request is made but the external id is already known to Echo360 then we can assume that this request is
+being retried and therefore if it fails on this occasion then we can assume it was successful previously and we can ignore the error.
+
+### Venue / Time slot is already taken
+When an insert or update request receives a `Schedule timing clash with another Schedule` error then record this error in
+`STT_ECHO_QUEUE.ERROR` and do not resend until the issue has been resolved manually.
+
+### Device not found in Room
+```json
+{"error":"JsonError","param":{"obj.venue.room":[{"msg":"Device not found in Room","args":[]}]}}
+```
+
+### Can a lecturer teach in 2 different rooms at the same time? YES
+To investigate this I created 2 almost identical schedules, with only
+the room and external ids being different as shown below:
+![Same Lecturer Different Room](img/same-lect-diff-room.png)
+
+This establishes that the same presenter can be assigned to
+present in different rooms but at the same time.
+
+### Other errors
+When any other errors occur note them in `STT_ECHO_QUEUE.ERROR`
+and await manual intervention before retrying.
 
 ===
-
-
-The details will then be read by a java process which will firstly determine what combination of 
-insert, update and delete notifications need to be sent to E360 to synchronize it with the data in CMIS.
-These notifications will then be persisted to the table STT_ECHO_NOTIFICATION.
-
-In the most common scenario the corresponding POST, PUT, DELETE requests will be sent to E360 successfully.
-As mentioned in the On Insert scenario, an error could occur where reference data is missing and 
-this will be rectified by supplying E360 with the reference data and then retrying the request. 
-
-In the scenario where E360 responds with a `Venue / Time slot is already taken` error
-then the process will attempt refresh the data in E360 with the latest data in CMIS for 
-a particular room and day.
-
-Where a different error is received then user intervention will be required to resolve
-the issue. A list of the notifications that failed will
-be displayed on the admin screen. 
-When Administrators deem that the underlying issue for a notification 
-failure has been resolved then they will be able to trigger
-a refresh of the Room/Day data to E360.
-
 
 
 
@@ -481,75 +542,6 @@ delete /public/api/v2/schedules/{schedule}
 ```
 where {schedule} can be an external id or an E360 id. We shall use the external id.
 
-## Error Handling
-
-When an error is received while processing a row within STT_ECHO_QUEUE
-then an attempt will be made to recover, e.g. to fix missing reference data, 
-however if that is not possible then the STT_ECHO_QUEUE.STATUS value for that row will be set to `FAILED`
-and a description of the error added to the STT_ECHO_QUEUE.ERROR column.
-
-A UI will be created to allow administrators to view the messages that have failed 
-and allow them to retry 1 or more messages.
-When the user submits a retry request via the UI then a new row(s) will be inserted into
-STT_ECHO_QUEUE and these will be processed when a subsequent CRON job runs.
-
-### Missing reference data
-
-The reference data contained within E360 will be largely complete however we cannot rely upon all
-the rooms, lecturers and sections (course + sub-group) and their parent entities being known to E360.
-
-![Class Diagram](img/class.png)
-
-When a request to insert or update the schedule data in E360 fails because an entity
-the schedule depends on is missing then SpaceTT2 will identify the type of 
-entity that is missing from the error response, insert the missing entity and any missing parent entities,
-and then attempt to insert or update the schedule data again.
-
-The approach may result in repeated attempts to insert or update the same schedule, for example,
-when the room, lecturer and course information are all missing from E360.
-
-#### Identifying missing reference data type
-
-When E360 is unable to identify a particular entity specified in a schedule request then it will 
-return an error code of `400` and a JSON response document containing `RoomNotFound`, `UserNotFound` or 
-`ScheduleNotFound` respectively. An example response document for the room not found scenario 
-would be:
-```json
-{
-  "error": "RoomNotFound",
-  "message": "Room not found"
-}
-```
-
-The parents of the Room and Section entities are shown in the diagram above.
-
-NB Users/Lecturers cannot be created via the REST API and therefore will require manual intervention.
-
-### External Id not unique
-If an insert request is made but the external id is already known to Echo360 then we can assume that this request is
-being retried and therefore if it fails on this occasion then we can assume it was successful previously and we can ignore the error.
-
-### Venue / Time slot is already taken
-When an insert or update request receives a `Schedule timing clash with another Schedule` error then record this error in
-`STT_ECHO_QUEUE.ERROR` and do not resend until the issue has been resolved manually.
-
-### Device not found in Room
-```json
-{"error":"JsonError","param":{"obj.venue.room":[{"msg":"Device not found in Room","args":[]}]}}
-```
-
-### Can a lecturer teach in 2 different rooms at the same time? YES
-To investigate this I created 2 almost identical schedules, with only
-the room and external ids being different as shown below:
-![Same Lecturer Different Room](img/same-lect-diff-room.png)
-
-This establishes that the same presenter can be assigned to
-present in different rooms but at the same time.
-
-### Other errors
-When any other errors occur note them in `STT_ECHO_QUEUE.ERROR`
-and await manual intervention before retrying.
-
 ## User Interface
 
 A user interface will be available to allow administrators to view the number of schedules that have been
@@ -590,3 +582,8 @@ SpaceTT2
 1. verify that where a timetable entry with entryslot <> 1 that it will not have an impact on integration
 2. could we update every minute in the expectation that few clashes will occur and repair clashes over-night with batch?
 3. when will E360 report a clash? 
+4. send emails to users with clashing events
+5. Run process in batch mode to update all rooms for the whole year.
+6. admin screen to view errors
+7. admin screen to run batch mode for selected rooms/all rooms
+
