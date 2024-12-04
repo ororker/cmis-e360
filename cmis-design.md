@@ -384,7 +384,7 @@ E360.
 
 NB We don't need the slot entry because it is always 1.
 
-## DB Table STT_ECHO_ROOM_DAY
+### DB Table STT_ECHO_ROOM_DAY
 
 This table will hold details of Room/Days that needed to be refreshed.
 
@@ -397,7 +397,7 @@ This table will hold details of Room/Days that needed to be refreshed.
 | TIMETABLE | ROOMID      | VARCHAR2(16) |                                                                 |
 | TIMETABLE | ROOMGRPCODE | VARCHAR2(12) |                                                                 |
 
-## DB Table STT_ECHO_NOTIFICATION
+### DB Table STT_ECHO_NOTIFICATION
 
 This table holds the details of the notification that will be sent to E360.
 
