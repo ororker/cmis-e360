@@ -207,15 +207,16 @@ Strategies 2 and 3 may be more complex to implement because we could have a situ
 
 ## Error Handling
 
-When an error is received while processing a row within STT_ECHO_QUEUE
-then an attempt will be made to recover, e.g. to fix missing reference data,
-however if that is not possible then the STT_ECHO_QUEUE.STATUS value for that row will be set to `FAILED`
-and a description of the error added to the STT_ECHO_QUEUE.ERROR column.
+When handling errors the first step is to determine whether the process can recover from the error.
+The errors that are recoverable are those relating to [Missing reference data](#Missing reference data)
+and conflicting event schedules which is described in the section [Refresh Room & Day Data](Refresh Room & Day Data).
+
+Where an error occurs that is not recoverable then it will be handled as described in [Other Errors](Other Errors).
 
 A UI will be created to allow administrators to view the messages that have failed
 and allow them to retry 1 or more messages.
 When the user submits a retry request via the UI then a new row(s) will be inserted into
-STT_ECHO_QUEUE and these will be processed when a subsequent CRON job runs.
+STT_ECHO_NOTIFICATION and STT_ECHO_ROOM_DAY. These rows will be processed when a subsequent CRON job runs and will result in the Room & Day data being refreshed.
 
 ### Missing reference data
 
@@ -247,34 +248,36 @@ would be:
 
 The parents of the Room and Section entities are shown in the diagram above.
 
-NB Users/Lecturers cannot be created via the REST API and therefore will require manual intervention.
-
 ### External Id not unique
 If an insert request is made but the external id is already known to Echo360 then we can assume that this request is
 being retried and therefore if it fails on this occasion then we can assume it was successful previously and we can ignore the error.
 
 ### Venue / Time slot is already taken
-When an insert or update request receives a `Schedule timing clash with another Schedule` error then record this error in
-`STT_ECHO_QUEUE.ERROR` and do not resend until the issue has been resolved manually.
+When an insert or update request receives a `Venue / Time slot is already taken` error then this will handled as described in the section [Refresh Room & Day Data](Refresh Room & Day Data)
 
 ### Device not found in Room
 ```json
 {"error":"JsonError","param":{"obj.venue.room":[{"msg":"Device not found in Room","args":[]}]}}
 ```
 
-### Can a lecturer teach in 2 different rooms at the same time? YES
-To investigate this I created 2 almost identical schedules, with only
+This error will require manual intervention to fix the data in E360.
+
+### Can a lecturer teach in 2 different rooms at the same time? Yes
+To investigate if this type of error could occur within E360 I created 2 almost identical schedules, with only
 the room and external ids being different as shown below:
 ![Same Lecturer Different Room](img/same-lect-diff-room.png)
 
 This establishes that the same presenter can be assigned to
-present in different rooms but at the same time.
+lecture in different rooms at the same time.
 
 ### Other errors
-When any other errors occur note them in `STT_ECHO_QUEUE.ERROR`
-and await manual intervention before retrying.
+When any other errors occur then the STATUS column of the STT_ECHO_NOTIFICATION will be set to ERROR, the MESSAGE column will be updated with the error message in the response from E360 and the PROCESSED column will be set to the current timestamp.
+
+After manual intervention to fix the problem the notification can be retried via the Admin UI.
+
 
 ===
+
 
 
 
