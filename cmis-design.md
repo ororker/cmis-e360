@@ -227,8 +227,7 @@ the rooms, lecturers and sections (course + sub-group) and their parent entities
 
 When a request to insert or update the schedule data in E360 fails because an entity
 the schedule depends on is missing then SpaceTT2 will identify the type of
-entity that is missing from the error response, insert the missing entity and any missing parent entities,
-and then attempt to insert or update the schedule data again.
+entity that is missing from the error response, insert the missing entity and any missing parent entities, and then attempt to resend the initial request.
 
 The approach may result in repeated attempts to insert or update the same schedule, for example,
 when the room, lecturer and course information are all missing from E360.
@@ -274,61 +273,6 @@ lecture in different rooms at the same time.
 When any other errors occur then the STATUS column of the STT_ECHO_NOTIFICATION will be set to ERROR, the MESSAGE column will be updated with the error message in the response from E360 and the PROCESSED column will be set to the current timestamp.
 
 After manual intervention to fix the problem the notification can be retried via the Admin UI.
-
-
-===
-
-
-
-
-Each update sent to E360 relies upon E360 being aware of the associated reference data, e.g. the course, room and lecturer data, and if E360 is not aware of this data then the request will fail. The failure message will indicate which piece of reference data is missing and the process will update E360 with this reference data before re-sending the initial request.
-
-In the event that E360 already has a lesson scheduled for a particular room and date/time, E360 will respond with the error `Venue / Time slot is already taken`.
-An attempt will now be made to refresh all scheduled events on this particular day in the room that has the clash.
-If a conflict still exists then a row will then be inserted into the STT_ECHO_DAY_ROOM table.
-When subsequent notifications are received for this room/day then a further full Room/Day refresh will take place, until the scheduling conflict is resolved.
-
-### Handling inconsistent states in CMIS
-
-Information will only be propagated from CMIS to E360 when the necessary data items have been entered, i.e.
-the date, time, room, lecturer and course. While the timetable is being developed, timetablers can specify 
-that a lesson will take place at the same time and place as another lesson. 
-If we were to send details of both lessons to E360 then E360 would reject the latter. 
-Subsequently if the former were to be rescheduled in CMIS to a different room, and we sent that update to E360,
-how would CMIS know to re-send details of the lesson that was previously rejected.
-
-There are many such scenarios where CMIS can move into and out of inconsistent states. 
-Please see the [Scenarios page](./scenarios.md) for details.
-
-This document will describe a strategy for handling these inconsistent states.
-
-### No of rooms E360 is used in (23/24): 198
-The following sql was used to identify all of the rooms with audio/visual equipment used for lectures in 2023/4
-
-<details>
-<summary>SQL</summary>
-
-```sql
-select 
-    roomid, roomgrpcode, count(*)
-from (
-    select t.roomid, t.roomgrpcode, (ws.startdate + t.weekday), t.starttime, t.finishtime, t.lecturerid, p.BUSINESSEMAIL, t.moduleid, t.modgrpcode, rr.itemnum, rr.featureid 
-    from timetable t 
-        inner join weekmapnumeric wmn on wmn.setid = t.setid and wmn.weekid = t.weekid
-        inner join weekstructure ws on ws.setid = wmn.setid and ws.weeknumber = wmn.weeknumber
-        left outer join stt_ext_person p on p.personno = t.lecturerid
-        left outer join roomrequests rr on rr.setid = t.setid and rr.slotid = t.slotid and rr.slotentry = t.slotentry
-    where t.setid = '2023/24' and t.slotentry = 1 and t.status = 2 and t.sourcesid = 'TEACH' and roomid is not null and rr.featureid in ('AUDIOREC', 'VIDEOREC')
-    order by t.roomid, ws.startdate, t.weekday, t.starttime
-) tt
-group by roomid, roomgrpcode
-order by 3 desc, 1, 2;
-```
-</details>
-
-The most used room was 203 Lec Theatre 1, Boyd Orr (ID=2950203) that was used 766 times.
-
-There are 198 rooms with audio/visual equipment.
 
 
 ## Component Interactions
@@ -569,6 +513,37 @@ and re-trigger the sending of the schedule change.
 - Add UI page to allow administrators to view messages that failed with their error messages.
 - Add UI page to allow administrators to retry one or more messages to be retried
 - Add UI page to allow administrators to pause the sending of messages to E360
+
+## Analysis
+
+### No of rooms E360 is used in (23/24): 198
+The following sql was used to identify all of the rooms with audio/visual equipment used for lectures in 2023/4
+
+<details>
+<summary>SQL</summary>
+
+```sql
+select 
+    roomid, roomgrpcode, count(*)
+from (
+    select t.roomid, t.roomgrpcode, (ws.startdate + t.weekday), t.starttime, t.finishtime, t.lecturerid, p.BUSINESSEMAIL, t.moduleid, t.modgrpcode, rr.itemnum, rr.featureid 
+    from timetable t 
+        inner join weekmapnumeric wmn on wmn.setid = t.setid and wmn.weekid = t.weekid
+        inner join weekstructure ws on ws.setid = wmn.setid and ws.weeknumber = wmn.weeknumber
+        left outer join stt_ext_person p on p.personno = t.lecturerid
+        left outer join roomrequests rr on rr.setid = t.setid and rr.slotid = t.slotid and rr.slotentry = t.slotentry
+    where t.setid = '2023/24' and t.slotentry = 1 and t.status = 2 and t.sourcesid = 'TEACH' and roomid is not null and rr.featureid in ('AUDIOREC', 'VIDEOREC')
+    order by t.roomid, ws.startdate, t.weekday, t.starttime
+) tt
+group by roomid, roomgrpcode
+order by 3 desc, 1, 2;
+```
+</details>
+
+The most used room was 203 Lec Theatre 1, Boyd Orr (ID=2950203) that was used 766 times.
+
+There are 198 rooms with audio/visual equipment.
+
 
 ## Definitions
 
