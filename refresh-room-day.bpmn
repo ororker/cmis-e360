@@ -57,18 +57,6 @@
         <bpmn:incoming>Flow_1lqnabx</bpmn:incoming>
         <bpmn:outgoing>Flow_07c0v3z</bpmn:outgoing>
       </bpmn:task>
-      <bpmn:task id="Activity_1h73jir" name="Update STT_DAY_ ROOM with RESOLVED = NULL">
-        <bpmn:incoming>Flow_059v1xj</bpmn:incoming>
-        <bpmn:outgoing>Flow_0ss49rd</bpmn:outgoing>
-      </bpmn:task>
-      <bpmn:task id="Activity_1uefbch" name="Update STT_DAY_ ROOM with RESOLVED = SYSDATE">
-        <bpmn:incoming>Flow_0fisilm</bpmn:incoming>
-        <bpmn:outgoing>Flow_1kr07zc</bpmn:outgoing>
-      </bpmn:task>
-      <bpmn:task id="Activity_1afhhus" name="Update STT_DAY_ ROOM with RESOLVED= NULL">
-        <bpmn:incoming>Flow_1y1dbhf</bpmn:incoming>
-        <bpmn:outgoing>Flow_0l0gocj</bpmn:outgoing>
-      </bpmn:task>
       <bpmn:task id="Activity_1197fgh" name="Update STT_ECHO_ NOTIFICATION STATUS = ERROR">
         <bpmn:incoming>Flow_0l0gocj</bpmn:incoming>
         <bpmn:outgoing>Flow_1jrzw67</bpmn:outgoing>
@@ -80,6 +68,18 @@
       <bpmn:task id="Activity_0wrgz58" name="Update STT_ECHO_ NOTIFICATION STATUS = REFRESHED">
         <bpmn:incoming>Flow_1kr07zc</bpmn:incoming>
         <bpmn:outgoing>Flow_0q436jp</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:task id="Activity_1h73jir" name="Update STT_ROOM _DAY with RESOLVED = NULL">
+        <bpmn:incoming>Flow_059v1xj</bpmn:incoming>
+        <bpmn:outgoing>Flow_0ss49rd</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:task id="Activity_1uefbch" name="Update STT_ROOM _DAY with RESOLVED = SYSDATE">
+        <bpmn:incoming>Flow_0fisilm</bpmn:incoming>
+        <bpmn:outgoing>Flow_1kr07zc</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:task id="Activity_1afhhus" name="Update STT_ROOM _DAY with RESOLVED= NULL">
+        <bpmn:incoming>Flow_1y1dbhf</bpmn:incoming>
+        <bpmn:outgoing>Flow_0l0gocj</bpmn:outgoing>
       </bpmn:task>
     </bpmn:subProcess>
     <bpmn:textAnnotation id="TextAnnotation_1q7brff">
