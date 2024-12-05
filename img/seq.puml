@@ -1,10 +1,8 @@
 @startuml
 CMIS -> TIMETABLE: Ins/Upd/Del \nTIMETABLE
 TIMETABLE -> TRIGGER: exec trigger
-TRIGGER -> PROC: E360_<ACTION>
-PROC -> STT_E360_QUEUE: Insert into
-note left: This proc evaluates the type of scenario\n and if necessary inserts into STT_E360_QUEUE
-
+TRIGGER -> STT_E360_QUEUE: Insert into
+note right: This proc evaluates the type of scenario\n and if necessary inserts into STT_E360_QUEUE
 E360Service<-SPRING_CRON  : processQueue
 note left: Job runs every minute
 E360Service -> STT_E360_QUEUE: getMessages
