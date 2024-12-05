@@ -34,7 +34,7 @@
         <bpmn:incoming>Flow_0q436jp</bpmn:incoming>
         <bpmn:incoming>Flow_1jrzw67</bpmn:incoming>
       </bpmn:endEvent>
-      <bpmn:task id="Activity_017sh1i" name="Fetch non-conflicting room data from CMIS">
+      <bpmn:task id="Activity_017sh1i" name="Fetch relevant room data from CMIS">
         <bpmn:incoming>Flow_160zv6j</bpmn:incoming>
         <bpmn:outgoing>Flow_0wwy50n</bpmn:outgoing>
       </bpmn:task>
@@ -114,6 +114,9 @@ Add DEL request where event in E360 but not CMIS</bpmn:text>
       <bpmndi:BPMNShape id="Event_0cm3cez_di" bpmnElement="Event_0cm3cez">
         <dc:Bounds x="287" y="149" width="36" height="36" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0hu442p" bpmnElement="Event_1j7k9s3">
+        <dc:Bounds x="1382" y="149" width="36" height="36" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_0cr6bqx" bpmnElement="Activity_017sh1i">
         <dc:Bounds x="525" y="127" width="100" height="80" />
         <bpmndi:BPMNLabel />
@@ -138,6 +141,10 @@ Add DEL request where event in E360 but not CMIS</bpmn:text>
         <dc:Bounds x="1130" y="310" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1197fgh_di" bpmnElement="Activity_1197fgh">
+        <dc:Bounds x="1260" y="310" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_02zbej9_di" bpmnElement="Activity_02zbej9">
         <dc:Bounds x="1260" y="220" width="100" height="80" />
         <bpmndi:BPMNLabel />
@@ -146,18 +153,19 @@ Add DEL request where event in E360 but not CMIS</bpmn:text>
         <dc:Bounds x="1260" y="127" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1197fgh_di" bpmnElement="Activity_1197fgh">
-        <dc:Bounds x="1260" y="310" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_0hu442p" bpmnElement="Event_1j7k9s3">
-        <dc:Bounds x="1382" y="149" width="36" height="36" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="BPMNEdge_1xmq1bc" bpmnElement="Flow_0fisilm">
         <di:waypoint x="1040" y="167" />
         <di:waypoint x="1125" y="167" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1047" y="150" width="77" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1y1dbhf_di" bpmnElement="Flow_1y1dbhf">
+        <di:waypoint x="1015" y="192" />
+        <di:waypoint x="1015" y="350" />
+        <di:waypoint x="1130" y="350" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1046" y="332" width="53" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_00lvloj" bpmnElement="Flow_059v1xj">
@@ -172,6 +180,23 @@ Add DEL request where event in E360 but not CMIS</bpmn:text>
         <di:waypoint x="935" y="167" />
         <di:waypoint x="990" y="167" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0e4fwfk_di" bpmnElement="Flow_0e4fwfk">
+        <di:waypoint x="1360" y="260" />
+        <di:waypoint x="1400" y="260" />
+        <di:waypoint x="1400" y="185" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0l0gocj_di" bpmnElement="Flow_0l0gocj">
+        <di:waypoint x="1230" y="350" />
+        <di:waypoint x="1260" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0q436jp_di" bpmnElement="Flow_0q436jp">
+        <di:waypoint x="1360" y="167" />
+        <di:waypoint x="1382" y="167" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ss49rd_di" bpmnElement="Flow_0ss49rd">
+        <di:waypoint x="1225" y="260" />
+        <di:waypoint x="1260" y="260" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_0eppg8v" bpmnElement="Flow_0wwy50n">
         <di:waypoint x="625" y="167" />
         <di:waypoint x="685" y="167" />
@@ -184,43 +209,18 @@ Add DEL request where event in E360 but not CMIS</bpmn:text>
         <di:waypoint x="465" y="167" />
         <di:waypoint x="525" y="167" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="BPMNEdge_168bryd" bpmnElement="Flow_1lqnabx">
-        <di:waypoint x="785" y="167" />
-        <di:waypoint x="835" y="167" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1y1dbhf_di" bpmnElement="Flow_1y1dbhf">
-        <di:waypoint x="1015" y="192" />
-        <di:waypoint x="1015" y="350" />
-        <di:waypoint x="1130" y="350" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1046" y="332" width="53" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0l0gocj_di" bpmnElement="Flow_0l0gocj">
-        <di:waypoint x="1230" y="350" />
-        <di:waypoint x="1260" y="350" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1kr07zc_di" bpmnElement="Flow_1kr07zc">
-        <di:waypoint x="1225" y="167" />
-        <di:waypoint x="1260" y="167" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1jrzw67_di" bpmnElement="Flow_1jrzw67">
         <di:waypoint x="1360" y="350" />
         <di:waypoint x="1400" y="350" />
         <di:waypoint x="1400" y="185" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0e4fwfk_di" bpmnElement="Flow_0e4fwfk">
-        <di:waypoint x="1360" y="260" />
-        <di:waypoint x="1400" y="260" />
-        <di:waypoint x="1400" y="185" />
+      <bpmndi:BPMNEdge id="Flow_1kr07zc_di" bpmnElement="Flow_1kr07zc">
+        <di:waypoint x="1225" y="167" />
+        <di:waypoint x="1260" y="167" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0q436jp_di" bpmnElement="Flow_0q436jp">
-        <di:waypoint x="1360" y="167" />
-        <di:waypoint x="1382" y="167" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0ss49rd_di" bpmnElement="Flow_0ss49rd">
-        <di:waypoint x="1225" y="260" />
-        <di:waypoint x="1260" y="260" />
+      <bpmndi:BPMNEdge id="BPMNEdge_168bryd" bpmnElement="Flow_1lqnabx">
+        <di:waypoint x="785" y="167" />
+        <di:waypoint x="835" y="167" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="TextAnnotation_1q7brff_di" bpmnElement="TextAnnotation_1q7brff">
         <dc:Bounds x="685" y="240" width="310" height="60" />
