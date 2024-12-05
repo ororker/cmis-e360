@@ -25,11 +25,11 @@
         <bpmn:outgoing>Flow_02a604h</bpmn:outgoing>
       </bpmn:task>
     </bpmn:subProcess>
-    <bpmn:task id="Activity_0nft5kq" name="for each week store INSERT notification in STT_ECHO_ NOTIFICATION">
+    <bpmn:task id="Activity_0nft5kq" name="for each week store DELETE notification in STT_ECHO_ NOTIFICATION">
       <bpmn:incoming>Flow_1y0ysbk</bpmn:incoming>
       <bpmn:outgoing>Flow_0gj8g1b</bpmn:outgoing>
     </bpmn:task>
-    <bpmn:intermediateThrowEvent id="Event_194spgz" name="Read oldest unprocessed INSERT row from STT_ECHO _QUEUE">
+    <bpmn:intermediateThrowEvent id="Event_194spgz" name="Read oldest unprocessed DELETE row from STT_ECHO _QUEUE">
       <bpmn:outgoing>Flow_0ioysnk</bpmn:outgoing>
     </bpmn:intermediateThrowEvent>
     <bpmn:task id="Activity_0wuva1r" name="Reads weeks associated with weekid">
