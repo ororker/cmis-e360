@@ -103,7 +103,7 @@
 | id | room | start | end |
 |----|------|-------|-----|
 
-## From no-conflict to conflict after event inserted to conflict with 2 existing event
+## From no-conflict to conflict after event inserted to conflict with two existing event
 
 **Given** the CMIS schedule is as follows:
 
